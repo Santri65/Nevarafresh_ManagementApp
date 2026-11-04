@@ -1,0 +1,283 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 636" role="img">
+  <title>Modelo Entidad-Relación — NevaraFresh Empleados</title>
+  <desc>Diagrama entidad-relación conceptual en SVG para la plataforma de empleados de supermercados NevaraFresh.</desc>
+
+  <defs>
+    <style>
+      .bg { fill: #FBFBFD; }
+      .header-title { font-family: ui-sans-serif, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif; font-size: 20px; font-weight: bold; fill: #161A26; }
+      .header-sub { font-family: ui-sans-serif, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif; font-size: 13px; fill: #79809A; }
+      .table-title { font-family: ui-sans-serif, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif; font-size: 14px; font-weight: bold; text-anchor: middle; }
+      .attr-text { font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 13px; fill: #161A26; }
+      .badge-text { font-family: ui-sans-serif, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif; font-size: 10.5px; font-weight: bold; fill: #FFFFFF; text-anchor: middle; }
+      .rel-line { fill: none; stroke: #556074; stroke-width: 1.75; }
+      .rel-label { font-family: ui-sans-serif, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif; font-size: 13px; font-weight: bold; fill: #556074; text-anchor: middle; }
+      .footer-text { font-family: ui-sans-serif, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif; font-size: 12.5px; fill: #79809A; text-anchor: middle; }
+    </style>
+  </defs>
+
+  <!-- Lienzo -->
+  <rect width="960" height="636" rx="16" class="bg"/>
+
+  <!-- Título y Subtítulo -->
+  <text x="32" y="44" class="header-title">Modelo Entidad-Relación (MER) — NevaraFresh Empleados</text>
+  <text x="32" y="66" class="header-sub">Diagrama conceptual de entidades operativas, atributos y relaciones de la plataforma</text>
+
+  <!-- ==================== LÍNEAS DE RELACIÓN ==================== -->
+
+  <!-- 1. Tienda (1) - Empleado (N) [Vertical Col 1] -->
+  <path d="M 360,240 V 332" class="rel-line"/>
+  <path d="M 351,254 H 369" class="rel-line"/>
+  <text x="378" y="258" class="rel-label">1</text>
+  <path d="M 360,308 L 349,332 M 360,308 L 360,332 M 360,308 L 371,332" class="rel-line"/>
+  <text x="378" y="312" class="rel-label">N</text>
+
+  <!-- 2. Tienda (1) - Inventario (N) [Horizontal Row 1 Col 1-2] -->
+  <path d="M 448,164 H 512" class="rel-line"/>
+  <path d="M 462,155 V 173" class="rel-line"/>
+  <text x="462" y="146" class="rel-label">1</text>
+  <path d="M 488,164 L 512,153 M 488,164 L 512,164 M 488,164 L 512,175" class="rel-line"/>
+  <text x="498" y="146" class="rel-label">N</text>
+
+  <!-- 3. Producto (1) - Inventario (N) [Horizontal Row 1 Col 2-3] -->
+  <path d="M 688,164 H 752" class="rel-line"/>
+  <path d="M 712,164 L 688,153 M 712,164 L 688,164 M 712,164 L 688,175" class="rel-line"/>
+  <text x="702" y="146" class="rel-label">N</text>
+  <path d="M 738,155 V 173" class="rel-line"/>
+  <text x="738" y="146" class="rel-label">1</text>
+
+  <!-- 4. Tienda (1) - RecepciónMercancía (N) [Horizontal Row 1 Col 0-1] -->
+  <path d="M 208,164 H 272" class="rel-line"/>
+  <path d="M 232,164 L 208,153 M 232,164 L 208,164 M 232,164 L 208,175" class="rel-line"/>
+  <text x="222" y="146" class="rel-label">N</text>
+  <path d="M 258,155 V 173" class="rel-line"/>
+  <text x="258" y="146" class="rel-label">1</text>
+
+  <!-- 5. Empleado (1) - Tarea (N) [Horizontal Row 2 Col 0-1] -->
+  <path d="M 208,408 H 272" class="rel-line"/>
+  <path d="M 232,408 L 208,397 M 232,408 L 208,408 M 232,408 L 208,419" class="rel-line"/>
+  <text x="222" y="390" class="rel-label">N</text>
+  <path d="M 258,399 V 417" class="rel-line"/>
+  <text x="258" y="390" class="rel-label">1</text>
+
+  <!-- 6. Empleado (1) - MovimientoInventario (N) [Horizontal Row 2 Col 1-2] -->
+  <path d="M 448,408 H 512" class="rel-line"/>
+  <path d="M 462,399 V 417" class="rel-line"/>
+  <text x="462" y="390" class="rel-label">1</text>
+  <path d="M 488,408 L 512,397 M 488,408 L 512,408 M 488,408 L 512,419" class="rel-line"/>
+  <text x="498" y="390" class="rel-label">N</text>
+
+  <!-- 7. Inventario (1) - MovimientoInventario (N) [Vertical Col 2] -->
+  <path d="M 600,268 V 332" class="rel-line"/>
+  <path d="M 591,282 H 609" class="rel-line"/>
+  <text x="618" y="286" class="rel-label">1</text>
+  <path d="M 600,308 L 589,332 M 600,308 L 600,332 M 600,308 L 611,332" class="rel-line"/>
+  <text x="618" y="312" class="rel-label">N</text>
+
+  <!-- 8. Empleado (1) - RecepciónMercancía (N) [Corredor Col 0-1] -->
+  <path d="M 208,200 H 248 V 360 H 272" class="rel-line"/>
+  <path d="M 232,200 L 208,189 M 232,200 L 208,200 M 232,200 L 208,211" class="rel-line"/>
+  <text x="222" y="182" class="rel-label">N</text>
+  <path d="M 258,351 V 369" class="rel-line"/>
+  <text x="258" y="342" class="rel-label">1</text>
+
+  <!-- 9. Tienda (1) - Tarea (N) [Corredor Col 0-1] -->
+  <path d="M 272,200 H 232 V 440 H 208" class="rel-line"/>
+  <path d="M 258,191 V 209" class="rel-line"/>
+  <text x="258" y="182" class="rel-label">1</text>
+  <path d="M 232,440 L 208,429 M 232,440 L 208,440 M 232,440 L 208,451" class="rel-line"/>
+  <text x="222" y="422" class="rel-label">N</text>
+
+  <!-- 10. Inventario (1) - Novedad (N) [Corredor Col 2-3] -->
+  <path d="M 688,210 H 720 V 360 H 752" class="rel-line"/>
+  <path d="M 702,201 V 219" class="rel-line"/>
+  <text x="702" y="192" class="rel-label">1</text>
+  <path d="M 728,360 L 752,349 M 728,360 L 752,360 M 728,360 L 752,371" class="rel-line"/>
+  <text x="738" y="342" class="rel-label">N</text>
+
+  <!-- 11. Empleado (1) - Novedad (N) [Canal inferior libre] -->
+  <path d="M 360,512 V 580 H 840 V 540" class="rel-line"/>
+  <path d="M 351,526 H 369" class="rel-line"/>
+  <text x="378" y="528" class="rel-label">1</text>
+  <path d="M 840,564 L 829,540 M 840,564 L 840,540 M 840,564 L 851,540" class="rel-line"/>
+  <text x="858" y="558" class="rel-label">N</text>
+
+  <!-- ==================== FILA 1 DE TABLAS ==================== -->
+
+  <!-- Tabla 1: RecepciónMercancía (Azul) -->
+  <g>
+    <rect x="32" y="88" width="176" height="152" rx="10" fill="#EEF1FF" stroke="#A9B4F2" stroke-width="1.5"/>
+    <text x="120" y="109" class="table-title" fill="#4453C9">RecepciónMercancía</text>
+    <path d="M 32,120 H 208" stroke="#A9B4F2" stroke-width="1.5"/>
+    
+    <!-- id_recepción (PK) -->
+    <rect x="42" y="125" width="26" height="18" rx="9" fill="#4453C9"/>
+    <text x="55" y="134" dy="0.35em" class="badge-text">PK</text>
+    <text x="78" y="134" dy="0.35em" class="attr-text">id_recepción</text>
+    
+    <!-- fecha_hora -->
+    <text x="78" y="162" dy="0.35em" class="attr-text">fecha_hora</text>
+    <!-- estado -->
+    <text x="78" y="190" dy="0.35em" class="attr-text">estado</text>
+    <!-- observaciones -->
+    <text x="78" y="218" dy="0.35em" class="attr-text">observaciones</text>
+  </g>
+
+  <!-- Tabla 2: Tienda (Verde) -->
+  <g>
+    <rect x="272" y="88" width="176" height="152" rx="10" fill="#E3F6F3" stroke="#86D3CA" stroke-width="1.5"/>
+    <text x="360" y="109" class="table-title" fill="#0F8478">Tienda</text>
+    <path d="M 272,120 H 448" stroke="#86D3CA" stroke-width="1.5"/>
+    
+    <!-- id_tienda (PK) -->
+    <rect x="282" y="125" width="26" height="18" rx="9" fill="#0F8478"/>
+    <text x="295" y="134" dy="0.35em" class="badge-text">PK</text>
+    <text x="318" y="134" dy="0.35em" class="attr-text">id_tienda</text>
+    
+    <!-- nombre -->
+    <text x="318" y="162" dy="0.35em" class="attr-text">nombre</text>
+    <!-- dirección -->
+    <text x="318" y="190" dy="0.35em" class="attr-text">dirección</text>
+    <!-- estado -->
+    <text x="318" y="218" dy="0.35em" class="attr-text">estado</text>
+  </g>
+
+  <!-- Tabla 3: Inventario (Ámbar) -->
+  <g>
+    <rect x="512" y="88" width="176" height="180" rx="10" fill="#FFF3DC" stroke="#F0C572" stroke-width="1.5"/>
+    <text x="600" y="109" class="table-title" fill="#A96C05">Inventario</text>
+    <path d="M 512,120 H 688" stroke="#F0C572" stroke-width="1.5"/>
+    
+    <!-- id_inventario (PK) -->
+    <rect x="522" y="125" width="26" height="18" rx="9" fill="#A96C05"/>
+    <text x="535" y="134" dy="0.35em" class="badge-text">PK</text>
+    <text x="558" y="134" dy="0.35em" class="attr-text">id_inventario</text>
+    
+    <!-- cantidad_disponible -->
+    <text x="558" y="162" dy="0.35em" class="attr-text">cantidad_disponible</text>
+    <!-- cantidad_en_bodega -->
+    <text x="558" y="190" dy="0.35em" class="attr-text">cantidad_en_bodega</text>
+    <!-- cantidad_en_exhibición -->
+    <text x="558" y="218" dy="0.35em" class="attr-text">cantidad_en_exhibición</text>
+    <!-- fecha_actualización -->
+    <text x="558" y="246" dy="0.35em" class="attr-text">fecha_actualización</text>
+  </g>
+
+  <!-- Tabla 4: Producto (Morado) -->
+  <g>
+    <rect x="752" y="88" width="176" height="180" rx="10" fill="#F4EBFF" stroke="#C9A6EE" stroke-width="1.5"/>
+    <text x="840" y="109" class="table-title" fill="#7439B8">Producto</text>
+    <path d="M 752,120 H 928" stroke="#C9A6EE" stroke-width="1.5"/>
+    
+    <!-- id_producto (PK) -->
+    <rect x="762" y="125" width="26" height="18" rx="9" fill="#7439B8"/>
+    <text x="775" y="134" dy="0.35em" class="badge-text">PK</text>
+    <text x="798" y="134" dy="0.35em" class="attr-text">id_producto</text>
+    
+    <!-- nombre -->
+    <text x="798" y="162" dy="0.35em" class="attr-text">nombre</text>
+    <!-- código_barras -->
+    <text x="798" y="190" dy="0.35em" class="attr-text">código_barras</text>
+    <!-- categoría -->
+    <text x="798" y="218" dy="0.35em" class="attr-text">categoría</text>
+    <!-- unidad_medida -->
+    <text x="798" y="246" dy="0.35em" class="attr-text">unidad_medida</text>
+  </g>
+
+  <!-- ==================== FILA 2 DE TABLAS ==================== -->
+
+  <!-- Tabla 5: Tarea (Azul) -->
+  <g>
+    <rect x="32" y="332" width="176" height="208" rx="10" fill="#EEF1FF" stroke="#A9B4F2" stroke-width="1.5"/>
+    <text x="120" y="353" class="table-title" fill="#4453C9">Tarea</text>
+    <path d="M 32,364 H 208" stroke="#A9B4F2" stroke-width="1.5"/>
+    
+    <!-- id_tarea (PK) -->
+    <rect x="42" y="369" width="26" height="18" rx="9" fill="#4453C9"/>
+    <text x="55" y="378" dy="0.35em" class="badge-text">PK</text>
+    <text x="78" y="378" dy="0.35em" class="attr-text">id_tarea</text>
+    
+    <!-- descripción -->
+    <text x="78" y="406" dy="0.35em" class="attr-text">descripción</text>
+    <!-- prioridad -->
+    <text x="78" y="434" dy="0.35em" class="attr-text">prioridad</text>
+    <!-- estado -->
+    <text x="78" y="462" dy="0.35em" class="attr-text">estado</text>
+    <!-- fecha_asignación -->
+    <text x="78" y="490" dy="0.35em" class="attr-text">fecha_asignación</text>
+    <!-- fecha_cierre -->
+    <text x="78" y="518" dy="0.35em" class="attr-text">fecha_cierre</text>
+  </g>
+
+  <!-- Tabla 6: Empleado (Verde) -->
+  <g>
+    <rect x="272" y="332" width="176" height="180" rx="10" fill="#E3F6F3" stroke="#86D3CA" stroke-width="1.5"/>
+    <text x="360" y="353" class="table-title" fill="#0F8478">Empleado</text>
+    <path d="M 272,364 H 448" stroke="#86D3CA" stroke-width="1.5"/>
+    
+    <!-- id_empleado (PK) -->
+    <rect x="282" y="369" width="26" height="18" rx="9" fill="#0F8478"/>
+    <text x="295" y="378" dy="0.35em" class="badge-text">PK</text>
+    <text x="318" y="378" dy="0.35em" class="attr-text">id_empleado</text>
+    
+    <!-- nombre -->
+    <text x="318" y="406" dy="0.35em" class="attr-text">nombre</text>
+    <!-- correo -->
+    <text x="318" y="434" dy="0.35em" class="attr-text">correo</text>
+    <!-- rol -->
+    <text x="318" y="462" dy="0.35em" class="attr-text">rol</text>
+    <!-- estado -->
+    <text x="318" y="490" dy="0.35em" class="attr-text">estado</text>
+  </g>
+
+  <!-- Tabla 7: MovimientoInventario (Ámbar) -->
+  <g>
+    <rect x="512" y="332" width="176" height="236" rx="10" fill="#FFF3DC" stroke="#F0C572" stroke-width="1.5"/>
+    <text x="600" y="353" class="table-title" fill="#A96C05">MovimientoInventario</text>
+    <path d="M 512,364 H 688" stroke="#F0C572" stroke-width="1.5"/>
+    
+    <!-- id_movimiento (PK) -->
+    <rect x="522" y="369" width="26" height="18" rx="9" fill="#A96C05"/>
+    <text x="535" y="378" dy="0.35em" class="badge-text">PK</text>
+    <text x="558" y="378" dy="0.35em" class="attr-text">id_movimiento</text>
+    
+    <!-- tipo_movimiento -->
+    <text x="558" y="406" dy="0.35em" class="attr-text">tipo_movimiento</text>
+    <!-- cantidad -->
+    <text x="558" y="434" dy="0.35em" class="attr-text">cantidad</text>
+    <!-- fecha_hora -->
+    <text x="558" y="462" dy="0.35em" class="attr-text">fecha_hora</text>
+    <!-- motivo -->
+    <text x="558" y="490" dy="0.35em" class="attr-text">motivo</text>
+    <!-- cantidad_anterior -->
+    <text x="558" y="518" dy="0.35em" class="attr-text">cantidad_anterior</text>
+    <!-- cantidad_nueva -->
+    <text x="558" y="546" dy="0.35em" class="attr-text">cantidad_nueva</text>
+  </g>
+
+  <!-- Tabla 8: Novedad (Morado) -->
+  <g>
+    <rect x="752" y="332" width="176" height="208" rx="10" fill="#F4EBFF" stroke="#C9A6EE" stroke-width="1.5"/>
+    <text x="840" y="353" class="table-title" fill="#7439B8">Novedad</text>
+    <path d="M 752,364 H 928" stroke="#C9A6EE" stroke-width="1.5"/>
+    
+    <!-- id_novedad (PK) -->
+    <rect x="762" y="369" width="26" height="18" rx="9" fill="#7439B8"/>
+    <text x="775" y="378" dy="0.35em" class="badge-text">PK</text>
+    <text x="798" y="378" dy="0.35em" class="attr-text">id_novedad</text>
+    
+    <!-- tipo_novedad -->
+    <text x="798" y="406" dy="0.35em" class="attr-text">tipo_novedad</text>
+    <!-- descripción -->
+    <text x="798" y="434" dy="0.35em" class="attr-text">descripción</text>
+    <!-- cantidad_afectada -->
+    <text x="798" y="462" dy="0.35em" class="attr-text">cantidad_afectada</text>
+    <!-- fecha_hora -->
+    <text x="798" y="490" dy="0.35em" class="attr-text">fecha_hora</text>
+    <!-- estado -->
+    <text x="798" y="518" dy="0.35em" class="attr-text">estado</text>
+  </g>
+
+  <!-- ==================== PIE DE DIAGRAMA ==================== -->
+  <text x="480" y="614" class="footer-text">Relaciones 1:N — La barra vertical (|) indica el lado uno (1) y la pata de gallo (⤚) indica el lado muchos (N)</text>
+</svg>
