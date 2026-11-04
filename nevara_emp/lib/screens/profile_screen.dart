@@ -3,10 +3,29 @@ import 'package:nevara_emp/components/profile_actions.dart';
 import 'package:nevara_emp/components/profile_header.dart';
 import 'package:nevara_emp/components/stats_row.dart';
 import 'package:nevara_emp/components/store_info_card.dart';
+import 'package:nevara_emp/models/store.dart';
 
 /// Screen presenting the store employee profile.
-class ProfileScreen extends StatelessWidget {
+class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
+
+  @override
+  State<ProfileScreen> createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends State<ProfileScreen> {
+  final Store _store = const Store(
+    id: 'TDA-003',
+    code: 'TDA-003',
+    name: 'Sede Principal Centro',
+    address: 'Cra. 5 # 12-34, Cali',
+    email: 'carlos.mendoza@nevarafresh.com',
+    status: 'Activo',
+  );
+
+  void _openStoreDetail() {
+    Navigator.pushNamed(context, '/store-detail', arguments: _store);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -18,33 +37,31 @@ class ProfileScreen extends StatelessWidget {
         backgroundColor: const Color(0xFF2E7D32),
         foregroundColor: Colors.white,
       ),
-      body: const SafeArea(
+      body: SafeArea(
         child: SingleChildScrollView(
-          padding: EdgeInsets.all(16),
+          padding: const EdgeInsets.all(16),
           child: Column(
             children: [
-              ProfileHeader(
+              const ProfileHeader(
                 image: 'https://picsum.photos/400',
                 name: 'Carlos Andrés Mendoza',
                 role: 'Encargado de inventario',
                 employeeId: 'EMP-1024',
                 status: 'Activo',
               ),
-              SizedBox(height: 16),
-              StatsRow(
+              const SizedBox(height: 16),
+              const StatsRow(
                 tasks: '8',
                 movements: '34',
                 incidents: '2',
               ),
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
               StoreInfoCard(
-                storeName: 'Sede Principal Centro',
-                storeCode: 'TDA-003',
-                storeAddress: 'Cra. 5 # 12-34, Cali',
-                email: 'carlos.mendoza@nevarafresh.com',
+                store: _store,
+                onTap: () => _openStoreDetail(),
               ),
-              SizedBox(height: 16),
-              ProfileActions(
+              const SizedBox(height: 16),
+              const ProfileActions(
                 primaryButtonText: 'Actualizar Información',
                 secondaryButtonText: 'Cerrar Sesión',
               ),
