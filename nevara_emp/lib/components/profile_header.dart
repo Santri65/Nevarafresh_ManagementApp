@@ -1,12 +1,16 @@
 import 'package:flutter/material.dart';
 
-/// Header card displaying employee avatar, name, role, employee code, and operational status.
+/// Header card displaying employee avatar, name, role, employee code, and operational status in dark mode.
 class ProfileHeader extends StatelessWidget {
   final String image;
   final String name;
   final String role;
   final String employeeId;
   final String status;
+
+  static const Color activeGreen = Color(0xFF2E7D32);
+  static const Color darkCardColor = Color(0xFF21252E);
+  static const Color darkBorderColor = Color(0xFF323744);
 
   const ProfileHeader({
     super.key,
@@ -21,10 +25,10 @@ class ProfileHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       elevation: 2,
-      color: Colors.white,
+      color: darkCardColor,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
-        side: const BorderSide(color: Color(0xFFE0E0E0), width: 1),
+        side: const BorderSide(color: darkBorderColor, width: 1),
       ),
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -32,6 +36,7 @@ class ProfileHeader extends StatelessWidget {
           children: [
             CircleAvatar(
               radius: 44,
+              backgroundColor: const Color(0xFF2B303C),
               backgroundImage: NetworkImage(image),
             ),
             const SizedBox(height: 12),
@@ -41,7 +46,7 @@ class ProfileHeader extends StatelessWidget {
               style: const TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
-                color: Color(0xFF1B1B2A),
+                color: Color(0xFFF1F5F9),
               ),
             ),
             const SizedBox(height: 4),
@@ -51,7 +56,7 @@ class ProfileHeader extends StatelessWidget {
               style: const TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w500,
-                color: Color(0xFF2E7D32),
+                color: Color(0xFF81C784),
               ),
             ),
             const SizedBox(height: 10),
@@ -64,7 +69,7 @@ class ProfileHeader extends StatelessWidget {
                     vertical: 4,
                   ),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFF1F5F9),
+                    color: const Color(0xFF2A2E3B),
                     borderRadius: BorderRadius.circular(16),
                   ),
                   child: Text(
@@ -72,7 +77,7 @@ class ProfileHeader extends StatelessWidget {
                     style: const TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w500,
-                      color: Color(0xFF475569),
+                      color: Color(0xFF94A3B8),
                     ),
                   ),
                 ),
@@ -83,15 +88,19 @@ class ProfileHeader extends StatelessWidget {
                     vertical: 4,
                   ),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFE8F5E9),
+                    color: activeGreen.withValues(alpha: 0.22),
                     borderRadius: BorderRadius.circular(16),
+                    border: Border.all(
+                      color: activeGreen.withValues(alpha: 0.5),
+                      width: 1,
+                    ),
                   ),
                   child: Row(
                     children: [
                       const Icon(
                         Icons.check_circle,
                         size: 14,
-                        color: Color(0xFF2E7D32),
+                        color: activeGreen,
                       ),
                       const SizedBox(width: 4),
                       Text(
@@ -99,7 +108,7 @@ class ProfileHeader extends StatelessWidget {
                         style: const TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.w600,
-                          color: Color(0xFF2E7D32),
+                          color: Color(0xFF81C784),
                         ),
                       ),
                     ],

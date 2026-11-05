@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
 
-/// Action buttons for profile settings and session management.
+/// Action buttons for profile settings and session management in dark mode.
 class ProfileActions extends StatelessWidget {
   final String primaryButtonText;
   final String secondaryButtonText;
+
+  static const Color primaryGreen = Color(0xFF2E7D32);
+  static const Color dangerTextColor = Color(0xFFEF9A9A);
+  static const Color dangerBorderColor = Color(0xFFC62828);
 
   const ProfileActions({
     super.key,
@@ -21,7 +25,7 @@ class ProfileActions extends StatelessWidget {
           child: ElevatedButton(
             onPressed: () {},
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF2E7D32),
+              backgroundColor: primaryGreen,
               foregroundColor: Colors.white,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8),
@@ -50,8 +54,8 @@ class ProfileActions extends StatelessWidget {
           child: OutlinedButton(
             onPressed: () {},
             style: OutlinedButton.styleFrom(
-              foregroundColor: const Color(0xFFC62828),
-              side: const BorderSide(color: Color(0xFFEF9A9A), width: 1.5),
+              foregroundColor: dangerTextColor,
+              side: const BorderSide(color: dangerBorderColor, width: 1.5),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8),
               ),
