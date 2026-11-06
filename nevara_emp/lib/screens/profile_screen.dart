@@ -14,6 +14,11 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
+  static const Color darkBackground = Color(0xFF16181E);
+  static const Color darkSurface = Color(0xFF1B1F27);
+  static const Color activeGreen = Color(0xFF81C784);
+  static const Color secondaryTextColor = Color(0xFF94A3B8);
+
   final Store _store = const Store(
     id: 'TDA-003',
     code: 'TDA-003',
@@ -30,12 +35,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF8F9FA),
+      backgroundColor: darkBackground,
       appBar: AppBar(
         title: const Text('Perfil'),
         centerTitle: true,
-        backgroundColor: const Color(0xFF2E7D32),
-        foregroundColor: Colors.white,
+        backgroundColor: darkSurface,
+        foregroundColor: const Color(0xFFF1F5F9),
+        elevation: 0,
       ),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -71,8 +77,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
       ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: 2,
-        selectedItemColor: const Color(0xFF2E7D32),
-        unselectedItemColor: const Color(0xFF757575),
+        backgroundColor: darkSurface,
+        selectedItemColor: activeGreen,
+        unselectedItemColor: secondaryTextColor,
+        elevation: 0,
+        onTap: (index) {
+          if (index == 1) {
+            Navigator.pushNamed(context, '/tasks');
+          }
+        },
         items: const [
           BottomNavigationBarItem(
             icon: Icon(Icons.inventory_2_outlined),
