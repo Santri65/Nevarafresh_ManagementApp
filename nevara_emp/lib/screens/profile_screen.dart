@@ -81,6 +81,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
         selectedItemColor: activeGreen,
         unselectedItemColor: secondaryTextColor,
         elevation: 0,
+        onTap: (index) {
+          if (index == 1) {
+            Navigator.pushNamed(context, '/tasks');
+          }
+        },
         items: const [
           BottomNavigationBarItem(
             icon: Icon(Icons.inventory_2_outlined),

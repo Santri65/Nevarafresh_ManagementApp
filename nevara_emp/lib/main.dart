@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:nevara_emp/screens/login_screen.dart';
 import 'package:nevara_emp/screens/profile_screen.dart';
 import 'package:nevara_emp/screens/store_detail_screen.dart';
+import 'package:nevara_emp/screens/tasks_screen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -26,6 +27,7 @@ class MyApp extends StatelessWidget {
         '/login': (context) => const LoginScreen(),
         '/profile': (context) => const ProfileScreen(),
         '/store-detail': (context) => const StoreDetailScreen(),
+        '/tasks': (context) => const TasksScreen(),
       },
     );
   }
