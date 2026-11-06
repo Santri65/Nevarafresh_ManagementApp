@@ -1,0 +1,106 @@
+import 'package:flutter/material.dart';
+import 'package:nevara_emp/components/profile_actions.dart';
+import 'package:nevara_emp/components/profile_header.dart';
+import 'package:nevara_emp/components/stats_row.dart';
+import 'package:nevara_emp/components/store_info_card.dart';
+import 'package:nevara_emp/models/store.dart';
+
+/// Screen presenting the store employee profile.
+class ProfileScreen extends StatefulWidget {
+  const ProfileScreen({super.key});
+
+  @override
+  State<ProfileScreen> createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends State<ProfileScreen> {
+  static const Color darkBackground = Color(0xFF16181E);
+  static const Color darkSurface = Color(0xFF1B1F27);
+  static const Color activeGreen = Color(0xFF81C784);
+  static const Color secondaryTextColor = Color(0xFF94A3B8);
+
+  final Store _store = const Store(
+    id: 'TDA-003',
+    code: 'TDA-003',
+    name: 'Sede Principal Centro',
+    address: 'Cra. 5 # 12-34, Cali',
+    email: 'carlos.mendoza@nevarafresh.com',
+    status: 'Activo',
+  );
+
+  void _openStoreDetail() {
+    Navigator.pushNamed(context, '/store-detail', arguments: _store);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: darkBackground,
+      appBar: AppBar(
+        title: const Text('Perfil'),
+        centerTitle: true,
+        backgroundColor: darkSurface,
+        foregroundColor: const Color(0xFFF1F5F9),
+        elevation: 0,
+      ),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            children: [
+              const ProfileHeader(
+                image: 'https://picsum.photos/400',
+                name: 'Carlos Andrés Mendoza',
+                role: 'Encargado de inventario',
+                employeeId: 'EMP-1024',
+                status: 'Activo',
+              ),
+              const SizedBox(height: 16),
+              const StatsRow(
+                tasks: '8',
+                movements: '34',
+                incidents: '2',
+              ),
+              const SizedBox(height: 16),
+              StoreInfoCard(
+                store: _store,
+                onTap: () => _openStoreDetail(),
+              ),
+              const SizedBox(height: 16),
+              const ProfileActions(
+                primaryButtonText: 'Actualizar Información',
+                secondaryButtonText: 'Cerrar Sesión',
+              ),
+            ],
+          ),
+        ),
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: 2,
+        backgroundColor: darkSurface,
+        selectedItemColor: activeGreen,
+        unselectedItemColor: secondaryTextColor,
+        elevation: 0,
+        onTap: (index) {
+          if (index == 1) {
+            Navigator.pushNamed(context, '/tasks');
+          }
+        },
+        items: const [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.inventory_2_outlined),
+            label: 'Inventario',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.assignment_outlined),
+            label: 'Tareas',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.person),
+            label: 'Perfil',
+          ),
+        ],
+      ),
+    );
+  }
+}
