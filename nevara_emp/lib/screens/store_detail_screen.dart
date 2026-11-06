@@ -3,20 +3,15 @@ import 'package:nevara_emp/models/store.dart';
 
 /// Screen displaying the details of a store.
 class StoreDetailScreen extends StatelessWidget {
-  const StoreDetailScreen({super.key});
+  final Store store;
+
+  const StoreDetailScreen({
+    super.key,
+    required this.store,
+  });
 
   @override
   Widget build(BuildContext context) {
-    final store = ModalRoute.of(context)?.settings.arguments as Store? ??
-        const Store(
-          id: 'TDA-003',
-          code: 'TDA-003',
-          name: 'Sede Principal Centro',
-          address: 'Cra. 5 # 12-34, Cali',
-          email: 'carlos.mendoza@nevarafresh.com',
-          status: 'Activo',
-        );
-
     return Scaffold(
       backgroundColor: const Color(0xFFF8F9FA),
       appBar: AppBar(
