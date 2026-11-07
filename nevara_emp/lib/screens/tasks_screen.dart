@@ -15,8 +15,6 @@ class _TasksScreenState extends State<TasksScreen> {
   static const Color darkBackground = Color(0xFF16181E);
   static const Color darkSurface = Color(0xFF1B1F27);
   static const Color primaryTextColor = Color(0xFFF1F5F9);
-  static const Color secondaryTextColor = Color(0xFF94A3B8);
-  static const Color activeGreen = Color(0xFF81C784);
 
   TaskFilter _filter = TaskFilter.all;
 
@@ -167,27 +165,6 @@ class _TasksScreenState extends State<TasksScreen> {
             );
           },
         ),
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: 1,
-        backgroundColor: darkSurface,
-        selectedItemColor: activeGreen,
-        unselectedItemColor: secondaryTextColor,
-        elevation: 0,
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.inventory_2_outlined),
-            label: 'Inventario',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.assignment_outlined),
-            label: 'Tareas',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: 'Perfil',
-          ),
-        ],
       ),
     );
   }

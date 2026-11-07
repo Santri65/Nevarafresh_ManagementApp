@@ -24,8 +24,8 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   void _handleLogin() {
-    // Navigate to profile or main screen upon login
-    Navigator.pushReplacementNamed(context, '/profile');
+    // Navigate to main shell upon login
+    Navigator.pushReplacementNamed(context, '/home');
   }
 
   @override

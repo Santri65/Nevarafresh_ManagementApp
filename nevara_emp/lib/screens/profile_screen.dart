@@ -16,8 +16,6 @@ class ProfileScreen extends StatefulWidget {
 class _ProfileScreenState extends State<ProfileScreen> {
   static const Color darkBackground = Color(0xFF16181E);
   static const Color darkSurface = Color(0xFF1B1F27);
-  static const Color activeGreen = Color(0xFF81C784);
-  static const Color secondaryTextColor = Color(0xFF94A3B8);
 
   final Store _store = const Store(
     id: 'TDA-003',
@@ -74,32 +72,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ],
           ),
         ),
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: 2,
-        backgroundColor: darkSurface,
-        selectedItemColor: activeGreen,
-        unselectedItemColor: secondaryTextColor,
-        elevation: 0,
-        onTap: (index) {
-          if (index == 1) {
-            Navigator.pushNamed(context, '/tasks');
-          }
-        },
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.inventory_2_outlined),
-            label: 'Inventario',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.assignment_outlined),
-            label: 'Tareas',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: 'Perfil',
-          ),
-        ],
       ),
     );
   }
