@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:nevara_emp/models/store.dart';
 
-/// Card showing store details and employee contact info conforming to the MER.
+/// Card showing store details and employee contact info in dark mode.
 class StoreInfoCard extends StatelessWidget {
   final Store store;
   final Function() onTap;
+
+  static const Color darkCardColor = Color(0xFF21252E);
+  static const Color darkBorderColor = Color(0xFF323744);
+  static const Color activeGreen = Color(0xFF2E7D32);
 
   const StoreInfoCard({
     super.key,
@@ -18,10 +22,10 @@ class StoreInfoCard extends StatelessWidget {
       onTap: () => onTap(),
       child: Card(
         elevation: 2,
-        color: Colors.white,
+        color: darkCardColor,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
-          side: const BorderSide(color: Color(0xFFE0E0E0), width: 1),
+          side: const BorderSide(color: darkBorderColor, width: 1),
         ),
         child: Padding(
           padding: const EdgeInsets.all(16),
@@ -30,14 +34,14 @@ class StoreInfoCard extends StatelessWidget {
             children: [
               const Row(
                 children: [
-                  Icon(Icons.store, color: Color(0xFF2E7D32), size: 20),
+                  Icon(Icons.store, color: activeGreen, size: 20),
                   SizedBox(width: 8),
                   Text(
                     'Sede y Contacto Corporativo',
                     style: TextStyle(
                       fontSize: 15,
                       fontWeight: FontWeight.bold,
-                      color: Color(0xFF1B1B2A),
+                      color: Color(0xFFF1F5F9),
                     ),
                   ),
                 ],
@@ -48,7 +52,7 @@ class StoreInfoCard extends StatelessWidget {
                   const Icon(
                     Icons.business_outlined,
                     size: 20,
-                    color: Color(0xFF5B5E72),
+                    color: Color(0xFF94A3B8),
                   ),
                   const SizedBox(width: 12),
                   Column(
@@ -58,7 +62,7 @@ class StoreInfoCard extends StatelessWidget {
                         'Tienda asignada',
                         style: TextStyle(
                           fontSize: 11,
-                          color: Color(0xFF757575),
+                          color: Color(0xFF94A3B8),
                         ),
                       ),
                       Text(
@@ -66,7 +70,7 @@ class StoreInfoCard extends StatelessWidget {
                         style: const TextStyle(
                           fontSize: 13,
                           fontWeight: FontWeight.w600,
-                          color: Color(0xFF1B1B2A),
+                          color: Color(0xFFF1F5F9),
                         ),
                       ),
                     ],
@@ -79,7 +83,7 @@ class StoreInfoCard extends StatelessWidget {
                   const Icon(
                     Icons.location_on_outlined,
                     size: 20,
-                    color: Color(0xFF5B5E72),
+                    color: Color(0xFF94A3B8),
                   ),
                   const SizedBox(width: 12),
                   Column(
@@ -89,7 +93,7 @@ class StoreInfoCard extends StatelessWidget {
                         'Dirección de sede',
                         style: TextStyle(
                           fontSize: 11,
-                          color: Color(0xFF757575),
+                          color: Color(0xFF94A3B8),
                         ),
                       ),
                       Text(
@@ -97,7 +101,7 @@ class StoreInfoCard extends StatelessWidget {
                         style: const TextStyle(
                           fontSize: 13,
                           fontWeight: FontWeight.w500,
-                          color: Color(0xFF1B1B2A),
+                          color: Color(0xFFE2E8F0),
                         ),
                       ),
                     ],
@@ -110,7 +114,7 @@ class StoreInfoCard extends StatelessWidget {
                   const Icon(
                     Icons.email_outlined,
                     size: 20,
-                    color: Color(0xFF5B5E72),
+                    color: Color(0xFF94A3B8),
                   ),
                   const SizedBox(width: 12),
                   Column(
@@ -120,7 +124,7 @@ class StoreInfoCard extends StatelessWidget {
                         'Correo electrónico',
                         style: TextStyle(
                           fontSize: 11,
-                          color: Color(0xFF757575),
+                          color: Color(0xFF94A3B8),
                         ),
                       ),
                       Text(
@@ -128,7 +132,7 @@ class StoreInfoCard extends StatelessWidget {
                         style: const TextStyle(
                           fontSize: 13,
                           fontWeight: FontWeight.w500,
-                          color: Color(0xFF1B1B2A),
+                          color: Color(0xFFE2E8F0),
                         ),
                       ),
                     ],

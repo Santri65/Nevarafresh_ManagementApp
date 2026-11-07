@@ -1,24 +1,38 @@
 import 'package:flutter/material.dart';
 import 'package:nevara_emp/models/store.dart';
 
-/// Screen displaying the details of a store.
+/// Screen displaying the details of a store in dark mode.
 class StoreDetailScreen extends StatelessWidget {
-  final Store store;
+  static const Color darkBackground = Color(0xFF16181E);
+  static const Color darkSurface = Color(0xFF1B1F27);
+  static const Color darkCardColor = Color(0xFF21252E);
+  static const Color darkBorderColor = Color(0xFF323744);
+  static const Color primaryTextColor = Color(0xFFF1F5F9);
+  static const Color secondaryTextColor = Color(0xFF94A3B8);
+  static const Color activeGreen = Color(0xFF81C784);
 
-  const StoreDetailScreen({
-    super.key,
-    required this.store,
-  });
+  const StoreDetailScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final store = ModalRoute.of(context)?.settings.arguments as Store? ??
+        const Store(
+          id: 'TDA-003',
+          code: 'TDA-003',
+          name: 'Sede Principal Centro',
+          address: 'Cra. 5 # 12-34, Cali',
+          email: 'carlos.mendoza@nevarafresh.com',
+          status: 'Activo',
+        );
+
     return Scaffold(
-      backgroundColor: const Color(0xFFF8F9FA),
+      backgroundColor: darkBackground,
       appBar: AppBar(
         title: const Text('Detalle de Sede'),
         centerTitle: true,
-        backgroundColor: const Color(0xFF2E7D32),
-        foregroundColor: Colors.white,
+        backgroundColor: darkSurface,
+        foregroundColor: primaryTextColor,
+        elevation: 0,
       ),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -28,10 +42,10 @@ class StoreDetailScreen extends StatelessWidget {
             children: [
               Card(
                 elevation: 2,
-                color: Colors.white,
+                color: darkCardColor,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
-                  side: const BorderSide(color: Color(0xFFE0E0E0), width: 1),
+                  side: const BorderSide(color: darkBorderColor, width: 1),
                 ),
                 child: Padding(
                   padding: const EdgeInsets.all(20),
@@ -41,13 +55,13 @@ class StoreDetailScreen extends StatelessWidget {
                         width: 64,
                         height: 64,
                         decoration: BoxDecoration(
-                          color: const Color(0xFFE8F5E9),
+                          color: activeGreen.withValues(alpha: 0.16),
                           borderRadius: BorderRadius.circular(32),
                         ),
                         child: const Icon(
                           Icons.store,
                           size: 36,
-                          color: Color(0xFF2E7D32),
+                          color: activeGreen,
                         ),
                       ),
                       const SizedBox(height: 12),
@@ -57,7 +71,7 @@ class StoreDetailScreen extends StatelessWidget {
                         style: const TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
-                          color: Color(0xFF1B1B2A),
+                          color: primaryTextColor,
                         ),
                       ),
                       const SizedBox(height: 6),
@@ -70,7 +84,7 @@ class StoreDetailScreen extends StatelessWidget {
                               vertical: 4,
                             ),
                             decoration: BoxDecoration(
-                              color: const Color(0xFFF1F5F9),
+                              color: const Color(0xFF2A2E3B),
                               borderRadius: BorderRadius.circular(16),
                             ),
                             child: Text(
@@ -78,7 +92,7 @@ class StoreDetailScreen extends StatelessWidget {
                               style: const TextStyle(
                                 fontSize: 12,
                                 fontWeight: FontWeight.w500,
-                                color: Color(0xFF475569),
+                                color: secondaryTextColor,
                               ),
                             ),
                           ),
@@ -89,15 +103,19 @@ class StoreDetailScreen extends StatelessWidget {
                               vertical: 4,
                             ),
                             decoration: BoxDecoration(
-                              color: const Color(0xFFE8F5E9),
+                              color: activeGreen.withValues(alpha: 0.22),
                               borderRadius: BorderRadius.circular(16),
+                              border: Border.all(
+                                color: activeGreen.withValues(alpha: 0.5),
+                                width: 1,
+                              ),
                             ),
                             child: Text(
                               store.status,
                               style: const TextStyle(
                                 fontSize: 12,
                                 fontWeight: FontWeight.w600,
-                                color: Color(0xFF2E7D32),
+                                color: activeGreen,
                               ),
                             ),
                           ),
@@ -110,10 +128,10 @@ class StoreDetailScreen extends StatelessWidget {
               const SizedBox(height: 16),
               Card(
                 elevation: 2,
-                color: Colors.white,
+                color: darkCardColor,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
-                  side: const BorderSide(color: Color(0xFFE0E0E0), width: 1),
+                  side: const BorderSide(color: darkBorderColor, width: 1),
                 ),
                 child: Padding(
                   padding: const EdgeInsets.all(16),
@@ -125,7 +143,7 @@ class StoreDetailScreen extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 15,
                           fontWeight: FontWeight.bold,
-                          color: Color(0xFF1B1B2A),
+                          color: primaryTextColor,
                         ),
                       ),
                       const SizedBox(height: 14),
@@ -134,7 +152,7 @@ class StoreDetailScreen extends StatelessWidget {
                           const Icon(
                             Icons.location_on_outlined,
                             size: 20,
-                            color: Color(0xFF5B5E72),
+                            color: secondaryTextColor,
                           ),
                           const SizedBox(width: 12),
                           Column(
@@ -144,7 +162,7 @@ class StoreDetailScreen extends StatelessWidget {
                                 'Dirección',
                                 style: TextStyle(
                                   fontSize: 11,
-                                  color: Color(0xFF757575),
+                                  color: secondaryTextColor,
                                 ),
                               ),
                               Text(
@@ -152,7 +170,7 @@ class StoreDetailScreen extends StatelessWidget {
                                 style: const TextStyle(
                                   fontSize: 13,
                                   fontWeight: FontWeight.w500,
-                                  color: Color(0xFF1B1B2A),
+                                  color: primaryTextColor,
                                 ),
                               ),
                             ],
@@ -165,7 +183,7 @@ class StoreDetailScreen extends StatelessWidget {
                           const Icon(
                             Icons.email_outlined,
                             size: 20,
-                            color: Color(0xFF5B5E72),
+                            color: secondaryTextColor,
                           ),
                           const SizedBox(width: 12),
                           Column(
@@ -175,7 +193,7 @@ class StoreDetailScreen extends StatelessWidget {
                                 'Correo electrónico corporativo',
                                 style: TextStyle(
                                   fontSize: 11,
-                                  color: Color(0xFF757575),
+                                  color: secondaryTextColor,
                                 ),
                               ),
                               Text(
@@ -183,7 +201,7 @@ class StoreDetailScreen extends StatelessWidget {
                                 style: const TextStyle(
                                   fontSize: 13,
                                   fontWeight: FontWeight.w500,
-                                  color: Color(0xFF1B1B2A),
+                                  color: primaryTextColor,
                                 ),
                               ),
                             ],

@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:nevara_emp/models/store.dart';
-import 'package:nevara_emp/screens/home_shell.dart';
+import 'package:nevara_emp/screens/login_screen.dart';
+import 'package:nevara_emp/screens/profile_screen.dart';
 import 'package:nevara_emp/screens/store_detail_screen.dart';
+import 'package:nevara_emp/screens/tasks_screen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -17,67 +18,16 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color(0xFF2E7D32),
+          seedColor: const Color(0xFF0F8478),
         ),
         useMaterial3: true,
       ),
-      initialRoute: '/',
-      onGenerateRoute: (settings) {
-        switch (settings.name) {
-          case '/':
-            return MaterialPageRoute(
-              builder: (context) => const HomeShell(),
-              settings: settings,
-            );
-          case '/store-detail':
-            final args = settings.arguments;
-            if (args is Store) {
-              return MaterialPageRoute(
-                builder: (context) => StoreDetailScreen(store: args),
-                settings: settings,
-              );
-            }
-            return MaterialPageRoute(
-              builder: (context) => Scaffold(
-                appBar: AppBar(
-                  title: const Text('Error'),
-                  centerTitle: true,
-                  backgroundColor: const Color(0xFF2E7D32),
-                  foregroundColor: Colors.white,
-                ),
-                body: const SafeArea(
-                  child: Center(
-                    child: Padding(
-                      padding: EdgeInsets.all(16),
-                      child: Text(
-                        'No se proporcionó una tienda válida.',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(fontSize: 16),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-              settings: settings,
-            );
-          default:
-            return MaterialPageRoute(
-              builder: (context) => Scaffold(
-                appBar: AppBar(
-                  title: const Text('Página no encontrada'),
-                  centerTitle: true,
-                  backgroundColor: const Color(0xFF2E7D32),
-                  foregroundColor: Colors.white,
-                ),
-                body: const SafeArea(
-                  child: Center(
-                    child: Text('Ruta no encontrada'),
-                  ),
-                ),
-              ),
-              settings: settings,
-            );
-        }
+      initialRoute: '/login',
+      routes: {
+        '/login': (context) => const LoginScreen(),
+        '/profile': (context) => const ProfileScreen(),
+        '/store-detail': (context) => const StoreDetailScreen(),
+        '/tasks': (context) => const TasksScreen(),
       },
     );
   }
