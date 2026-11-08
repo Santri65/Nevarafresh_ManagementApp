@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 class ProfileActions extends StatelessWidget {
   final String primaryButtonText;
   final String secondaryButtonText;
+  final VoidCallback? onPrimaryPressed;
+  final VoidCallback? onSecondaryPressed;
 
   static const Color primaryGreen = Color(0xFF2E7D32);
   static const Color dangerTextColor = Color(0xFFEF9A9A);
@@ -13,6 +15,8 @@ class ProfileActions extends StatelessWidget {
     super.key,
     required this.primaryButtonText,
     required this.secondaryButtonText,
+    this.onPrimaryPressed,
+    this.onSecondaryPressed,
   });
 
   @override
@@ -23,7 +27,7 @@ class ProfileActions extends StatelessWidget {
           width: double.infinity,
           height: 46,
           child: ElevatedButton(
-            onPressed: () {},
+            onPressed: onPrimaryPressed ?? () {},
             style: ElevatedButton.styleFrom(
               backgroundColor: primaryGreen,
               foregroundColor: Colors.white,
@@ -52,7 +56,7 @@ class ProfileActions extends StatelessWidget {
           width: double.infinity,
           height: 46,
           child: OutlinedButton(
-            onPressed: () {},
+            onPressed: onSecondaryPressed ?? () {},
             style: OutlinedButton.styleFrom(
               foregroundColor: dangerTextColor,
               side: const BorderSide(color: dangerBorderColor, width: 1.5),

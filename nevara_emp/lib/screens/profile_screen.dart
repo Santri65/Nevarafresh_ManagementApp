@@ -30,6 +30,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
     Navigator.pushNamed(context, '/store-detail', arguments: _store);
   }
 
+  void _handleLogout() {
+    Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -65,9 +69,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 onTap: () => _openStoreDetail(),
               ),
               const SizedBox(height: 16),
-              const ProfileActions(
+              ProfileActions(
                 primaryButtonText: 'Actualizar Información',
                 secondaryButtonText: 'Cerrar Sesión',
+                onSecondaryPressed: _handleLogout,
               ),
             ],
           ),
