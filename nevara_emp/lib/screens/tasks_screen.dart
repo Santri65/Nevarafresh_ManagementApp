@@ -5,7 +5,12 @@ import 'package:nevara_emp/models/task.dart';
 
 /// Screen for consulting and updating the employee's operational tasks.
 class TasksScreen extends StatefulWidget {
-  const TasksScreen({super.key});
+  final VoidCallback? onBackToProfile;
+
+  const TasksScreen({
+    super.key,
+    this.onBackToProfile,
+  });
 
   @override
   State<TasksScreen> createState() => _TasksScreenState();
@@ -119,7 +124,8 @@ class _TasksScreenState extends State<TasksScreen> {
         ),
         actions: [
           IconButton(
-            onPressed: () => Navigator.maybePop(context),
+            onPressed: widget.onBackToProfile ??
+                () => Navigator.maybePop(context),
             tooltip: 'Regresar',
             icon: const Icon(Icons.arrow_back_rounded),
           ),

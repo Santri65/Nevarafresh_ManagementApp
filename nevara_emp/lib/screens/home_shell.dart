@@ -26,12 +26,12 @@ class _HomeShellState extends State<HomeShell> {
 
   static const Color darkBackground = Color(0xFF16181E);
 
-  static const List<Widget> _screens = [
-    InventoryScreen(),
-    IncidentsScreen(),
-    TransfersScreen(),
-    TasksScreen(),
-    ProfileScreen(),
+  List<Widget> get _screens => [
+    InventoryScreen(onBackToProfile: _goToProfile),
+    IncidentsScreen(onBackToProfile: _goToProfile),
+    TransfersScreen(onBackToProfile: _goToProfile),
+    TasksScreen(onBackToProfile: _goToProfile),
+    const ProfileScreen(),
   ];
 
   @override
@@ -43,6 +43,12 @@ class _HomeShellState extends State<HomeShell> {
   void _onDestinationSelected(int index) {
     setState(() {
       _currentIndex = index;
+    });
+  }
+
+  void _goToProfile() {
+    setState(() {
+      _currentIndex = 4;
     });
   }
 

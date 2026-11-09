@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:nevara_emp/screens/home_shell.dart';
 import 'package:nevara_emp/screens/login_screen.dart';
+import 'package:nevara_emp/screens/security_screen.dart';
 import 'package:nevara_emp/screens/store_detail_screen.dart';
 
 void main() {
@@ -31,6 +32,7 @@ class MyApp extends StatelessWidget {
         '/tasks': (context) => const HomeShell(initialIndex: 3),
         '/profile': (context) => const HomeShell(initialIndex: 4),
         '/store-detail': (context) => const StoreDetailScreen(),
+        '/security': (context) => const SecurityScreen(),
       },
     );
   }

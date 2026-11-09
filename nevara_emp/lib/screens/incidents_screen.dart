@@ -21,7 +21,12 @@ class IncidentReport {
 
 /// Screen presenting store reports and incidents, allowing employees to register new reports.
 class IncidentsScreen extends StatefulWidget {
-  const IncidentsScreen({super.key});
+  final VoidCallback? onBackToProfile;
+
+  const IncidentsScreen({
+    super.key,
+    this.onBackToProfile,
+  });
 
   @override
   State<IncidentsScreen> createState() => _IncidentsScreenState();
@@ -210,23 +215,35 @@ class _IncidentsScreenState extends State<IncidentsScreen> {
                   ),
                 ),
                 ElevatedButton(
-                  onPressed: () {
-                    if (descController.text.trim().isNotEmpty) {
-                      final qty = int.tryParse(qtyController.text.trim()) ?? 0;
-                      setState(() {
-                        _reports.insert(
-                          0,
-                          IncidentReport(
-                            id: 'REP-0${40 + _reports.length + 2}',
-                            type: selectedType,
-                            description: descController.text.trim(),
-                            affectedQuantity: qty,
-                            dateTime: '06/11/2026 12:00',
-                            status: 'Pendiente',
-                          ),
-                        );
-                      });
+                  onPressed: () async {
+                    if (descController.text.trim().isEmpty) {
+                      Navigator.pop(ctx);
+                      return;
                     }
+
+                    final authorized = await Navigator.pushNamed<bool>(
+                      context,
+                      '/security',
+                    );
+
+                    if (authorized != true || !mounted || !ctx.mounted) {
+                      return;
+                    }
+
+                    final qty = int.tryParse(qtyController.text.trim()) ?? 0;
+                    setState(() {
+                      _reports.insert(
+                        0,
+                        IncidentReport(
+                          id: 'REP-0${40 + _reports.length + 2}',
+                          type: selectedType,
+                          description: descController.text.trim(),
+                          affectedQuantity: qty,
+                          dateTime: '06/11/2026 12:00',
+                          status: 'Pendiente',
+                        ),
+                      );
+                    });
                     Navigator.pop(ctx);
                   },
                   style: ElevatedButton.styleFrom(
@@ -262,6 +279,7 @@ class _IncidentsScreenState extends State<IncidentsScreen> {
     return Scaffold(
       backgroundColor: darkBackground,
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         title: const Text('Reportes y Novedades'),
         centerTitle: false,
         backgroundColor: darkSurface,
@@ -269,7 +287,7 @@ class _IncidentsScreenState extends State<IncidentsScreen> {
         elevation: 0,
         actions: [
           Padding(
-            padding: const EdgeInsets.only(right: 12),
+            padding: const EdgeInsets.only(right: 4),
             child: ElevatedButton.icon(
               onPressed: _showNewReportDialog,
               style: ElevatedButton.styleFrom(
@@ -286,6 +304,12 @@ class _IncidentsScreenState extends State<IncidentsScreen> {
                 style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
               ),
             ),
+          ),
+          IconButton(
+            onPressed: widget.onBackToProfile ??
+                () => Navigator.maybePop(context),
+            tooltip: 'Regresar',
+            icon: const Icon(Icons.arrow_back_rounded),
           ),
         ],
       ),

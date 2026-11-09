@@ -27,7 +27,12 @@ class InventoryItem {
 
 /// Screen presenting the store inventory management module.
 class InventoryScreen extends StatefulWidget {
-  const InventoryScreen({super.key});
+  final VoidCallback? onBackToProfile;
+
+  const InventoryScreen({
+    super.key,
+    this.onBackToProfile,
+  });
 
   @override
   State<InventoryScreen> createState() => _InventoryScreenState();
@@ -128,11 +133,20 @@ class _InventoryScreenState extends State<InventoryScreen> {
     return Scaffold(
       backgroundColor: darkBackground,
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         title: const Text('Inventario de Tienda'),
         centerTitle: false,
         backgroundColor: darkSurface,
         foregroundColor: primaryTextColor,
         elevation: 0,
+        actions: [
+          IconButton(
+            onPressed: widget.onBackToProfile ??
+                () => Navigator.maybePop(context),
+            tooltip: 'Regresar',
+            icon: const Icon(Icons.arrow_back_rounded),
+          ),
+        ],
       ),
       body: SafeArea(
         child: Padding(

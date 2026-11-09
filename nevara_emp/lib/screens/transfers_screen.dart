@@ -25,7 +25,12 @@ class ProductTransfer {
 
 /// Screen presenting product transfers between NevaraFresh stores.
 class TransfersScreen extends StatefulWidget {
-  const TransfersScreen({super.key});
+  final VoidCallback? onBackToProfile;
+
+  const TransfersScreen({
+    super.key,
+    this.onBackToProfile,
+  });
 
   @override
   State<TransfersScreen> createState() => _TransfersScreenState();
@@ -223,27 +228,39 @@ class _TransfersScreenState extends State<TransfersScreen> {
               ),
             ),
             ElevatedButton(
-              onPressed: () {
-                if (destinationController.text.trim().isNotEmpty &&
-                    productController.text.trim().isNotEmpty) {
-                  setState(() {
-                    _transfers.insert(
-                      0,
-                      ProductTransfer(
-                        id: 'TRS-${200 + _transfers.length + 1}',
-                        originStore: 'Sede Principal Centro',
-                        destinationStore: destinationController.text.trim(),
-                        product: productController.text.trim(),
-                        quantity: quantityController.text.trim().isNotEmpty
-                            ? quantityController.text.trim()
-                            : '1 un',
-                        status: 'Pendiente',
-                        date: '06/11/2026',
-                        responsible: 'Carlos Andrés Mendoza',
-                      ),
-                    );
-                  });
+              onPressed: () async {
+                if (destinationController.text.trim().isEmpty ||
+                    productController.text.trim().isEmpty) {
+                  Navigator.pop(ctx);
+                  return;
                 }
+
+                final authorized = await Navigator.pushNamed<bool>(
+                  context,
+                  '/security',
+                );
+
+                if (authorized != true || !mounted || !ctx.mounted) {
+                  return;
+                }
+
+                setState(() {
+                  _transfers.insert(
+                    0,
+                    ProductTransfer(
+                      id: 'TRS-${200 + _transfers.length + 1}',
+                      originStore: 'Sede Principal Centro',
+                      destinationStore: destinationController.text.trim(),
+                      product: productController.text.trim(),
+                      quantity: quantityController.text.trim().isNotEmpty
+                          ? quantityController.text.trim()
+                          : '1 un',
+                      status: 'Pendiente',
+                      date: '06/11/2026',
+                      responsible: 'Carlos Andrés Mendoza',
+                    ),
+                  );
+                });
                 Navigator.pop(ctx);
               },
               style: ElevatedButton.styleFrom(
@@ -289,6 +306,7 @@ class _TransfersScreenState extends State<TransfersScreen> {
     return Scaffold(
       backgroundColor: darkBackground,
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         title: const Text('Traslado de Productos'),
         centerTitle: false,
         backgroundColor: darkSurface,
@@ -296,7 +314,7 @@ class _TransfersScreenState extends State<TransfersScreen> {
         elevation: 0,
         actions: [
           Padding(
-            padding: const EdgeInsets.only(right: 12),
+            padding: const EdgeInsets.only(right: 4),
             child: ElevatedButton.icon(
               onPressed: _showNewTransferDialog,
               style: ElevatedButton.styleFrom(
@@ -313,6 +331,12 @@ class _TransfersScreenState extends State<TransfersScreen> {
                 style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
               ),
             ),
+          ),
+          IconButton(
+            onPressed: widget.onBackToProfile ??
+                () => Navigator.maybePop(context),
+            tooltip: 'Regresar',
+            icon: const Icon(Icons.arrow_back_rounded),
           ),
         ],
       ),
