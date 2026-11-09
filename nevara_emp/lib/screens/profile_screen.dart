@@ -4,6 +4,7 @@ import 'package:nevara_emp/components/profile_header.dart';
 import 'package:nevara_emp/components/stats_row.dart';
 import 'package:nevara_emp/components/store_info_card.dart';
 import 'package:nevara_emp/models/store.dart';
+import 'package:nevara_emp/models/user_session.dart';
 
 /// Screen presenting the store employee profile.
 class ProfileScreen extends StatefulWidget {
@@ -30,6 +31,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
     Navigator.pushNamed(context, '/store-detail', arguments: _store);
   }
 
+  void _handleLogout() {
+    UserSession.logout();
+    Navigator.pushReplacementNamed(context, '/login');
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -46,10 +52,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
           padding: const EdgeInsets.all(16),
           child: Column(
             children: [
-              const ProfileHeader(
+              ProfileHeader(
                 image: 'https://picsum.photos/400',
-                name: 'Carlos Andrés Mendoza',
-                role: 'Encargado de inventario',
+                name: UserSession.currentName,
+                role: UserSession.currentRole,
                 employeeId: 'EMP-1024',
                 status: 'Activo',
               ),
@@ -65,9 +71,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 onTap: () => _openStoreDetail(),
               ),
               const SizedBox(height: 16),
-              const ProfileActions(
+              ProfileActions(
                 primaryButtonText: 'Actualizar Información',
                 secondaryButtonText: 'Cerrar Sesión',
+                onSecondaryPressed: _handleLogout,
               ),
             ],
           ),

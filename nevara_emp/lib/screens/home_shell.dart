@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:nevara_emp/components/app_navigation_rail.dart';
+import 'package:nevara_emp/screens/admission_screen.dart';
 import 'package:nevara_emp/screens/incidents_screen.dart';
 import 'package:nevara_emp/screens/inventory_screen.dart';
 import 'package:nevara_emp/screens/profile_screen.dart';
@@ -30,6 +31,7 @@ class _HomeShellState extends State<HomeShell> {
     InventoryScreen(),
     IncidentsScreen(),
     TransfersScreen(),
+    AdmissionScreen(),
     TasksScreen(),
     ProfileScreen(),
   ];

@@ -1,29 +1,6 @@
 import 'package:flutter/material.dart';
-
-/// Item representing a product in store inventory according to the MER model.
-class InventoryItem {
-  final String id;
-  final String name;
-  final String barcode;
-  final String category;
-  final String unit;
-  final int totalAvailable;
-  final int inWarehouse;
-  final int onDisplay;
-  final bool needsRestock;
-
-  const InventoryItem({
-    required this.id,
-    required this.name,
-    required this.barcode,
-    required this.category,
-    required this.unit,
-    required this.totalAvailable,
-    required this.inWarehouse,
-    required this.onDisplay,
-    this.needsRestock = false,
-  });
-}
+import 'package:nevara_emp/models/inventory_item.dart';
+import 'package:nevara_emp/models/inventory_repository.dart';
 
 /// Screen presenting the store inventory management module.
 class InventoryScreen extends StatefulWidget {
@@ -43,82 +20,337 @@ class _InventoryScreenState extends State<InventoryScreen> {
   static const Color activeGreen = Color(0xFF81C784);
   static const Color emeraldBrand = Color(0xFF0F8478);
   static const Color warningOrange = Color(0xFFFFB74D);
+  static const Color dangerCoral = Color(0xFFFF8A80);
 
   String _searchQuery = '';
   String _selectedCategory = 'Todas';
 
-  final List<InventoryItem> _items = const [
-    InventoryItem(
-      id: 'PROD-001',
-      name: 'Manzana Royal Gala',
-      barcode: '7701234567891',
-      category: 'Frutas y Verduras',
-      unit: 'kg',
-      totalAvailable: 85,
-      inWarehouse: 50,
-      onDisplay: 35,
-    ),
-    InventoryItem(
-      id: 'PROD-002',
-      name: 'Leche Entera 1L',
-      barcode: '7709876543210',
-      category: 'Lácteos',
-      unit: 'un',
-      totalAvailable: 120,
-      inWarehouse: 80,
-      onDisplay: 40,
-    ),
-    InventoryItem(
-      id: 'PROD-003',
-      name: 'Tomate Chonto',
-      barcode: '7705432167894',
-      category: 'Frutas y Verduras',
-      unit: 'kg',
-      totalAvailable: 32,
-      inWarehouse: 12,
-      onDisplay: 20,
-      needsRestock: true,
-    ),
-    InventoryItem(
-      id: 'PROD-004',
-      name: 'Pechuga de Pollo Fresca',
-      barcode: '7706549873215',
-      category: 'Carnes',
-      unit: 'kg',
-      totalAvailable: 45,
-      inWarehouse: 25,
-      onDisplay: 20,
-    ),
-    InventoryItem(
-      id: 'PROD-005',
-      name: 'Arroz Blanco Especial 1kg',
-      barcode: '7703216549872',
-      category: 'Granos y Abarrotes',
-      unit: 'un',
-      totalAvailable: 210,
-      inWarehouse: 150,
-      onDisplay: 60,
-    ),
-    InventoryItem(
-      id: 'PROD-006',
-      name: 'Queso Campesino 500g',
-      barcode: '7708529631478',
-      category: 'Lácteos',
-      unit: 'un',
-      totalAvailable: 18,
-      inWarehouse: 6,
-      onDisplay: 12,
-      needsRestock: true,
-    ),
-  ];
+  final InventoryRepository _repository = InventoryRepository.instance;
+
+  @override
+  void initState() {
+    super.initState();
+    _repository.addListener(_onRepositoryUpdated);
+  }
+
+  @override
+  void dispose() {
+    _repository.removeListener(_onRepositoryUpdated);
+    super.dispose();
+  }
+
+  void _onRepositoryUpdated() {
+    if (mounted) {
+      setState(() {});
+    }
+  }
 
   List<InventoryItem> get _filteredItems {
-    return _items.where((item) {
+    return _repository.items.where((item) {
       final matchesSearch = item.name.toLowerCase().contains(_searchQuery.toLowerCase()) ||
           item.barcode.contains(_searchQuery);
       final matchesCategory = _selectedCategory == 'Todas' || item.category == _selectedCategory;
       return matchesSearch && matchesCategory;
     }).toList();
+  }
+
+  void _handleSellUnit(InventoryItem item) {
+    final success = _repository.decrementUnit(item.id);
+    if (success) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Venta registrada: -1 ${item.unit} de ${item.name}'),
+          backgroundColor: const Color(0xFF1B1F27),
+          duration: const Duration(seconds: 2),
+        ),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('No hay existencias disponibles para vender "${item.name}".'),
+          backgroundColor: dangerCoral,
+          duration: const Duration(seconds: 2),
+        ),
+      );
+    }
+  }
+
+  void _handleAddUnit(InventoryItem item) {
+    _repository.incrementUnit(item.id);
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Existencia agregada: +1 ${item.unit} a ${item.name}'),
+        backgroundColor: const Color(0xFF1B1F27),
+        duration: const Duration(seconds: 2),
+      ),
+    );
+  }
+
+  void _showAddProductDialog() {
+    final nameController = TextEditingController();
+    final barcodeController = TextEditingController();
+    final warehouseController = TextEditingController(text: '10');
+    final displayController = TextEditingController(text: '10');
+    String selectedCategory = 'Frutas y Verduras';
+    String selectedUnit = 'un';
+
+    final categories = [
+      'Frutas y Verduras',
+      'Lácteos',
+      'Carnes',
+      'Granos y Abarrotes',
+      'Panadería',
+      'Aseo y Limpieza',
+    ];
+
+    final units = ['un', 'kg', 'g', 'litro', 'paquete'];
+
+    showDialog(
+      context: context,
+      builder: (ctx) {
+        return StatefulBuilder(
+          builder: (dialogCtx, setDialogState) {
+            return AlertDialog(
+              backgroundColor: darkSurface,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(14),
+                side: const BorderSide(color: darkBorderColor),
+              ),
+              title: const Row(
+                children: [
+                  Icon(Icons.add_box_rounded, color: activeGreen),
+                  SizedBox(width: 8),
+                  Text(
+                    'Agregar Nuevo Producto',
+                    style: TextStyle(
+                      color: primaryTextColor,
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+              content: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    TextField(
+                      controller: nameController,
+                      style: const TextStyle(color: primaryTextColor),
+                      decoration: InputDecoration(
+                        labelText: 'Nombre del producto',
+                        labelStyle: const TextStyle(color: secondaryTextColor),
+                        hintText: 'ej. Aguacate Hass',
+                        hintStyle: const TextStyle(color: Color(0xFF64748B)),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                          borderSide: const BorderSide(color: darkBorderColor),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                          borderSide: const BorderSide(color: activeGreen),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    TextField(
+                      controller: barcodeController,
+                      keyboardType: TextInputType.number,
+                      style: const TextStyle(color: primaryTextColor),
+                      decoration: InputDecoration(
+                        labelText: 'Código de barras',
+                        labelStyle: const TextStyle(color: secondaryTextColor),
+                        hintText: 'ej. 7701234567890',
+                        hintStyle: const TextStyle(color: Color(0xFF64748B)),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                          borderSide: const BorderSide(color: darkBorderColor),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                          borderSide: const BorderSide(color: activeGreen),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text(
+                                'Categoría:',
+                                style: TextStyle(color: secondaryTextColor, fontSize: 11),
+                              ),
+                              const SizedBox(height: 4),
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 10),
+                                decoration: BoxDecoration(
+                                  color: darkCardColor,
+                                  borderRadius: BorderRadius.circular(8),
+                                  border: Border.all(color: darkBorderColor),
+                                ),
+                                child: DropdownButtonHideUnderline(
+                                  child: DropdownButton<String>(
+                                    value: selectedCategory,
+                                    isExpanded: true,
+                                    dropdownColor: darkSurface,
+                                    style: const TextStyle(color: primaryTextColor, fontSize: 13),
+                                    items: categories.map((cat) {
+                                      return DropdownMenuItem(value: cat, child: Text(cat, overflow: TextOverflow.ellipsis));
+                                    }).toList(),
+                                    onChanged: (val) {
+                                      if (val != null) {
+                                        setDialogState(() => selectedCategory = val);
+                                      }
+                                    },
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(width: 10),
+                        SizedBox(
+                          width: 90,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text(
+                                'Unidad:',
+                                style: TextStyle(color: secondaryTextColor, fontSize: 11),
+                              ),
+                              const SizedBox(height: 4),
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 10),
+                                decoration: BoxDecoration(
+                                  color: darkCardColor,
+                                  borderRadius: BorderRadius.circular(8),
+                                  border: Border.all(color: darkBorderColor),
+                                ),
+                                child: DropdownButtonHideUnderline(
+                                  child: DropdownButton<String>(
+                                    value: selectedUnit,
+                                    isExpanded: true,
+                                    dropdownColor: darkSurface,
+                                    style: const TextStyle(color: primaryTextColor, fontSize: 13),
+                                    items: units.map((u) {
+                                      return DropdownMenuItem(value: u, child: Text(u));
+                                    }).toList(),
+                                    onChanged: (val) {
+                                      if (val != null) {
+                                        setDialogState(() => selectedUnit = val);
+                                      }
+                                    },
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: TextField(
+                            controller: warehouseController,
+                            keyboardType: TextInputType.number,
+                            style: const TextStyle(color: primaryTextColor),
+                            decoration: InputDecoration(
+                              labelText: 'En Bodega',
+                              labelStyle: const TextStyle(color: secondaryTextColor, fontSize: 12),
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8),
+                                borderSide: const BorderSide(color: darkBorderColor),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8),
+                                borderSide: const BorderSide(color: activeGreen),
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: TextField(
+                            controller: displayController,
+                            keyboardType: TextInputType.number,
+                            style: const TextStyle(color: primaryTextColor),
+                            decoration: InputDecoration(
+                              labelText: 'En Exhibición',
+                              labelStyle: const TextStyle(color: secondaryTextColor, fontSize: 12),
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8),
+                                borderSide: const BorderSide(color: darkBorderColor),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8),
+                                borderSide: const BorderSide(color: activeGreen),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(ctx),
+                  child: const Text('Cancelar', style: TextStyle(color: secondaryTextColor)),
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    final name = nameController.text.trim();
+                    if (name.isEmpty) return;
+
+                    final barcode = barcodeController.text.trim().isNotEmpty
+                        ? barcodeController.text.trim()
+                        : '770${DateTime.now().millisecondsSinceEpoch.toString().substring(4, 13)}';
+
+                    final warehouse = int.tryParse(warehouseController.text.trim()) ?? 0;
+                    final display = int.tryParse(displayController.text.trim()) ?? 0;
+                    final total = warehouse + display;
+
+                    final newItem = InventoryItem(
+                      id: 'PROD-00${_repository.items.length + 1}',
+                      name: name,
+                      barcode: barcode,
+                      category: selectedCategory,
+                      unit: selectedUnit,
+                      totalAvailable: total,
+                      inWarehouse: warehouse,
+                      onDisplay: display,
+                      needsRestock: total <= 20,
+                    );
+
+                    _repository.addProduct(newItem);
+                    Navigator.pop(ctx);
+
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text('Producto "$name" agregado al inventario.'),
+                        backgroundColor: darkSurface,
+                      ),
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: emeraldBrand,
+                    foregroundColor: Colors.white,
+                  ),
+                  child: const Text('Guardar Producto'),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
   }
 
   @override
@@ -133,6 +365,27 @@ class _InventoryScreenState extends State<InventoryScreen> {
         backgroundColor: darkSurface,
         foregroundColor: primaryTextColor,
         elevation: 0,
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 12),
+            child: ElevatedButton.icon(
+              onPressed: _showAddProductDialog,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: emeraldBrand,
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+              icon: const Icon(Icons.add, size: 18),
+              label: const Text(
+                'Agregar Producto',
+                style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
+              ),
+            ),
+          ),
+        ],
       ),
       body: SafeArea(
         child: Padding(
@@ -167,7 +420,7 @@ class _InventoryScreenState extends State<InventoryScreen> {
               ),
               const SizedBox(height: 12),
 
-              // Categories row
+              // Categories horizontal filter
               SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
                 child: Row(
@@ -177,6 +430,8 @@ class _InventoryScreenState extends State<InventoryScreen> {
                     'Lácteos',
                     'Carnes',
                     'Granos y Abarrotes',
+                    'Panadería',
+                    'Aseo y Limpieza',
                   ].map((category) {
                     final isSelected = _selectedCategory == category;
                     return Padding(
@@ -208,7 +463,7 @@ class _InventoryScreenState extends State<InventoryScreen> {
               ),
               const SizedBox(height: 16),
 
-              // Stock cards list
+              // Stock cards list with sell and add item operations
               Expanded(
                 child: filtered.isEmpty
                     ? const Center(
@@ -236,6 +491,7 @@ class _InventoryScreenState extends State<InventoryScreen> {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
+                                  // Product header row
                                   Row(
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -327,13 +583,15 @@ class _InventoryScreenState extends State<InventoryScreen> {
                                     ],
                                   ),
                                   const Divider(color: darkBorderColor, height: 20),
+
+                                  // Stock amounts breakdown
                                   Row(
                                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                                     children: [
                                       _StockBadge(
                                         label: 'Disponible',
                                         value: '${item.totalAvailable} ${item.unit}',
-                                        color: activeGreen,
+                                        color: item.totalAvailable > 0 ? activeGreen : dangerCoral,
                                       ),
                                       _StockBadge(
                                         label: 'En Bodega',
@@ -346,6 +604,77 @@ class _InventoryScreenState extends State<InventoryScreen> {
                                         color: primaryTextColor,
                                       ),
                                     ],
+                                  ),
+                                  const SizedBox(height: 12),
+
+                                  // Sales and stock adjustment actions bar
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                                    decoration: BoxDecoration(
+                                      color: Colors.black26,
+                                      borderRadius: BorderRadius.circular(8),
+                                      border: Border.all(color: darkBorderColor),
+                                    ),
+                                    child: Row(
+                                      children: [
+                                        const Text(
+                                          'Administrar ventas / Stock:',
+                                          style: TextStyle(
+                                            color: secondaryTextColor,
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.w500,
+                                          ),
+                                        ),
+                                        const Spacer(),
+                                        // Vender (-1)
+                                        OutlinedButton.icon(
+                                          onPressed: item.totalAvailable > 0
+                                              ? () => _handleSellUnit(item)
+                                              : null,
+                                          style: OutlinedButton.styleFrom(
+                                            foregroundColor: dangerCoral,
+                                            side: BorderSide(
+                                              color: item.totalAvailable > 0
+                                                  ? dangerCoral.withValues(alpha: 0.6)
+                                                  : Colors.white12,
+                                            ),
+                                            padding: const EdgeInsets.symmetric(
+                                              horizontal: 10,
+                                              vertical: 6,
+                                            ),
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius: BorderRadius.circular(6),
+                                            ),
+                                          ),
+                                          icon: const Icon(Icons.remove, size: 14),
+                                          label: const Text(
+                                            'Vender -1',
+                                            style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold),
+                                          ),
+                                        ),
+                                        const SizedBox(width: 8),
+                                        // Agregar (+1)
+                                        ElevatedButton.icon(
+                                          onPressed: () => _handleAddUnit(item),
+                                          style: ElevatedButton.styleFrom(
+                                            backgroundColor: emeraldBrand,
+                                            foregroundColor: Colors.white,
+                                            padding: const EdgeInsets.symmetric(
+                                              horizontal: 10,
+                                              vertical: 6,
+                                            ),
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius: BorderRadius.circular(6),
+                                            ),
+                                          ),
+                                          icon: const Icon(Icons.add, size: 14),
+                                          label: const Text(
+                                            'Agregar +1',
+                                            style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                 ],
                               ),

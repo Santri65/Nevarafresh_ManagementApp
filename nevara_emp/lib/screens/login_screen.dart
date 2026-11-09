@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:nevara_emp/models/user_session.dart';
 
 /// Screen for employee authentication / lobby in Nevara Fresh.
 class LoginScreen extends StatefulWidget {
@@ -9,8 +10,10 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  final TextEditingController _usernameController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _usernameController =
+      TextEditingController(text: 'carlos.mendoza');
+  final TextEditingController _passwordController =
+      TextEditingController(text: 'password123');
   bool _obscurePassword = true;
 
   static const Color emeraldGreen = Color(0xFF0F8478);
@@ -24,7 +27,14 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   void _handleLogin() {
-    // Navigate to main shell upon login
+    final username = _usernameController.text.trim();
+    final password = _passwordController.text.trim();
+
+    UserSession.login(
+      username: username.isNotEmpty ? username : 'carlos.mendoza',
+      password: password.isNotEmpty ? password : 'password123',
+    );
+
     Navigator.pushReplacementNamed(context, '/home');
   }
 
@@ -89,7 +99,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
               // Username field
               const Text(
-                'Usuario',
+                'Usuario o Correo',
                 style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
@@ -102,10 +112,12 @@ class _LoginScreenState extends State<LoginScreen> {
                 keyboardType: TextInputType.text,
                 decoration: InputDecoration(
                   hintText: 'ej. carlos.mendoza',
-                  prefixIcon: const Icon(Icons.person_outline_rounded, color: Color(0xFF94A3B8)),
+                  prefixIcon: const Icon(Icons.person_outline_rounded,
+                      color: Color(0xFF94A3B8)),
                   filled: true,
                   fillColor: Colors.white,
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                  contentPadding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                     borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
@@ -116,7 +128,8 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
-                    borderSide: const BorderSide(color: emeraldGreen, width: 1.8),
+                    borderSide:
+                        const BorderSide(color: emeraldGreen, width: 1.8),
                   ),
                 ),
               ),
@@ -137,10 +150,13 @@ class _LoginScreenState extends State<LoginScreen> {
                 obscureText: _obscurePassword,
                 decoration: InputDecoration(
                   hintText: '••••••••',
-                  prefixIcon: const Icon(Icons.lock_outline_rounded, color: Color(0xFF94A3B8)),
+                  prefixIcon: const Icon(Icons.lock_outline_rounded,
+                      color: Color(0xFF94A3B8)),
                   suffixIcon: IconButton(
                     icon: Icon(
-                      _obscurePassword ? Icons.visibility_outlined : Icons.visibility_off_outlined,
+                      _obscurePassword
+                          ? Icons.visibility_outlined
+                          : Icons.visibility_off_outlined,
                       color: const Color(0xFF94A3B8),
                     ),
                     onPressed: () {
@@ -151,7 +167,8 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   filled: true,
                   fillColor: Colors.white,
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                  contentPadding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                     borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
@@ -162,7 +179,8 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
-                    borderSide: const BorderSide(color: emeraldGreen, width: 1.8),
+                    borderSide:
+                        const BorderSide(color: emeraldGreen, width: 1.8),
                   ),
                 ),
               ),

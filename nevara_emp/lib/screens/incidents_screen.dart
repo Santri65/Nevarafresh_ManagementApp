@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:nevara_emp/models/user_session.dart';
 
 /// Model representing an incident or operational report in the store.
 class IncidentReport {
@@ -8,6 +9,7 @@ class IncidentReport {
   final int affectedQuantity;
   final String dateTime;
   final String status;
+  final String authorizedBy;
 
   const IncidentReport({
     required this.id,
@@ -16,6 +18,7 @@ class IncidentReport {
     required this.affectedQuantity,
     required this.dateTime,
     required this.status,
+    this.authorizedBy = 'carlos.mendoza@nevarafresh.com',
   });
 }
 
@@ -36,6 +39,7 @@ class _IncidentsScreenState extends State<IncidentsScreen> {
   static const Color secondaryTextColor = Color(0xFF94A3B8);
   static const Color activeGreen = Color(0xFF81C784);
   static const Color emeraldBrand = Color(0xFF0F8478);
+  static const Color dangerCoral = Color(0xFFFF8A80);
 
   String _filter = 'Todos';
 
@@ -47,6 +51,7 @@ class _IncidentsScreenState extends State<IncidentsScreen> {
       affectedQuantity: 4,
       dateTime: '06/11/2026 10:30',
       status: 'Pendiente',
+      authorizedBy: 'carlos.mendoza@nevarafresh.com',
     ),
     const IncidentReport(
       id: 'REP-040',
@@ -55,6 +60,7 @@ class _IncidentsScreenState extends State<IncidentsScreen> {
       affectedQuantity: 2,
       dateTime: '06/11/2026 08:15',
       status: 'En revisión',
+      authorizedBy: 'carlos.mendoza@nevarafresh.com',
     ),
     const IncidentReport(
       id: 'REP-039',
@@ -63,6 +69,7 @@ class _IncidentsScreenState extends State<IncidentsScreen> {
       affectedQuantity: 0,
       dateTime: '05/11/2026 17:45',
       status: 'En revisión',
+      authorizedBy: 'carlos.mendoza@nevarafresh.com',
     ),
     const IncidentReport(
       id: 'REP-038',
@@ -71,6 +78,7 @@ class _IncidentsScreenState extends State<IncidentsScreen> {
       affectedQuantity: 12,
       dateTime: '04/11/2026 14:20',
       status: 'Resuelto',
+      authorizedBy: 'carlos.mendoza@nevarafresh.com',
     ),
   ];
 
@@ -85,6 +93,11 @@ class _IncidentsScreenState extends State<IncidentsScreen> {
     final typeController = TextEditingController(text: 'Diferencia de Inventario');
     final descController = TextEditingController();
     final qtyController = TextEditingController();
+    final emailController = TextEditingController(text: UserSession.currentEmail);
+    final passwordController = TextEditingController();
+
+    bool obscurePassword = true;
+    String? errorMessage;
 
     final reportTypes = [
       'Diferencia de Inventario',
@@ -161,7 +174,7 @@ class _IncidentsScreenState extends State<IncidentsScreen> {
                     const SizedBox(height: 12),
                     TextField(
                       controller: descController,
-                      maxLines: 3,
+                      maxLines: 2,
                       style: const TextStyle(color: primaryTextColor),
                       decoration: InputDecoration(
                         labelText: 'Descripción de la situación',
@@ -198,6 +211,138 @@ class _IncidentsScreenState extends State<IncidentsScreen> {
                         ),
                       ),
                     ),
+                    const SizedBox(height: 16),
+
+                    // Authorization requirement section
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: Colors.black38,
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(color: darkBorderColor),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          const Row(
+                            children: [
+                              Icon(Icons.lock_person_rounded,
+                                  size: 16, color: activeGreen),
+                              SizedBox(width: 6),
+                              Text(
+                                'Autorización Obligatoria',
+                                style: TextStyle(
+                                  color: primaryTextColor,
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 4),
+                          const Text(
+                            'Para completar este reporte debe ingresar su correo y contraseña:',
+                            style: TextStyle(
+                              color: secondaryTextColor,
+                              fontSize: 11,
+                            ),
+                          ),
+                          const SizedBox(height: 10),
+                          TextField(
+                            controller: emailController,
+                            keyboardType: TextInputType.emailAddress,
+                            style: const TextStyle(
+                                color: primaryTextColor, fontSize: 13),
+                            decoration: InputDecoration(
+                              labelText: 'Correo electrónico',
+                              labelStyle: const TextStyle(
+                                  color: secondaryTextColor, fontSize: 12),
+                              prefixIcon: const Icon(Icons.email_outlined,
+                                  size: 18, color: secondaryTextColor),
+                              contentPadding: const EdgeInsets.symmetric(
+                                  horizontal: 10, vertical: 8),
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8),
+                                borderSide:
+                                    const BorderSide(color: darkBorderColor),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8),
+                                borderSide:
+                                    const BorderSide(color: activeGreen),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 10),
+                          TextField(
+                            controller: passwordController,
+                            obscureText: obscurePassword,
+                            style: const TextStyle(
+                                color: primaryTextColor, fontSize: 13),
+                            decoration: InputDecoration(
+                              labelText: 'Contraseña de confirmación',
+                              labelStyle: const TextStyle(
+                                  color: secondaryTextColor, fontSize: 12),
+                              prefixIcon: const Icon(Icons.lock_outline,
+                                  size: 18, color: secondaryTextColor),
+                              suffixIcon: IconButton(
+                                icon: Icon(
+                                  obscurePassword
+                                      ? Icons.visibility_outlined
+                                      : Icons.visibility_off_outlined,
+                                  size: 18,
+                                  color: secondaryTextColor,
+                                ),
+                                onPressed: () {
+                                  setDialogState(() {
+                                    obscurePassword = !obscurePassword;
+                                  });
+                                },
+                              ),
+                              contentPadding: const EdgeInsets.symmetric(
+                                  horizontal: 10, vertical: 8),
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8),
+                                borderSide:
+                                    const BorderSide(color: darkBorderColor),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8),
+                                borderSide:
+                                    const BorderSide(color: activeGreen),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    if (errorMessage != null) ...[
+                      const SizedBox(height: 10),
+                      Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: dangerCoral.withValues(alpha: 0.15),
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(
+                              color: dangerCoral.withValues(alpha: 0.5)),
+                        ),
+                        child: Row(
+                          children: [
+                            const Icon(Icons.error_outline,
+                                size: 16, color: dangerCoral),
+                            const SizedBox(width: 6),
+                            Expanded(
+                              child: Text(
+                                errorMessage!,
+                                style: const TextStyle(
+                                    color: dangerCoral, fontSize: 11),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
                   ],
                 ),
               ),
@@ -211,29 +356,69 @@ class _IncidentsScreenState extends State<IncidentsScreen> {
                 ),
                 ElevatedButton(
                   onPressed: () {
-                    if (descController.text.trim().isNotEmpty) {
-                      final qty = int.tryParse(qtyController.text.trim()) ?? 0;
-                      setState(() {
-                        _reports.insert(
-                          0,
-                          IncidentReport(
-                            id: 'REP-0${40 + _reports.length + 2}',
-                            type: selectedType,
-                            description: descController.text.trim(),
-                            affectedQuantity: qty,
-                            dateTime: '06/11/2026 12:00',
-                            status: 'Pendiente',
-                          ),
-                        );
+                    final desc = descController.text.trim();
+                    final inputEmail = emailController.text.trim();
+                    final inputPassword = passwordController.text.trim();
+
+                    if (desc.isEmpty) {
+                      setDialogState(() {
+                        errorMessage =
+                            'Debe ingresar una descripción de la situación.';
                       });
+                      return;
                     }
+
+                    if (inputEmail.isEmpty || inputPassword.isEmpty) {
+                      setDialogState(() {
+                        errorMessage =
+                            'Debe ingresar el correo y la contraseña para completar el reporte.';
+                      });
+                      return;
+                    }
+
+                    // Strict validation against UserSession
+                    final isValid = UserSession.validateCredentials(
+                        inputEmail, inputPassword);
+
+                    if (!isValid) {
+                      setDialogState(() {
+                        errorMessage =
+                            'Credenciales incorrectas. Verifique correo y contraseña del usuario en sesión.';
+                      });
+                      return;
+                    }
+
+                    final qty = int.tryParse(qtyController.text.trim()) ?? 0;
+                    setState(() {
+                      _reports.insert(
+                        0,
+                        IncidentReport(
+                          id: 'REP-0${40 + _reports.length + 2}',
+                          type: selectedType,
+                          description: desc,
+                          affectedQuantity: qty,
+                          dateTime: '08/11/2026 12:00',
+                          status: 'Pendiente',
+                          authorizedBy: inputEmail,
+                        ),
+                      );
+                    });
+
                     Navigator.pop(ctx);
+
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(
+                            'Reporte autorizado y completado exitosamente por $inputEmail.'),
+                        backgroundColor: emeraldBrand,
+                      ),
+                    );
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: emeraldBrand,
                     foregroundColor: Colors.white,
                   ),
-                  child: const Text('Registrar'),
+                  child: const Text('Completar Reporte'),
                 ),
               ],
             );
@@ -322,7 +507,8 @@ class _IncidentsScreenState extends State<IncidentsScreen> {
                         backgroundColor: darkCardColor,
                         labelStyle: TextStyle(
                           color: isSelected ? activeGreen : secondaryTextColor,
-                          fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                          fontWeight:
+                              isSelected ? FontWeight.bold : FontWeight.normal,
                           fontSize: 13,
                         ),
                         side: BorderSide(
@@ -349,7 +535,7 @@ class _IncidentsScreenState extends State<IncidentsScreen> {
                             ),
                             const SizedBox(height: 12),
                             const Text(
-                              'Sin reportes en esta categoría',
+                              'No hay reportes en este estado',
                               style: TextStyle(
                                 color: primaryTextColor,
                                 fontSize: 16,
@@ -358,7 +544,7 @@ class _IncidentsScreenState extends State<IncidentsScreen> {
                             ),
                             const SizedBox(height: 4),
                             const Text(
-                              'Pulsa "Hacer Reporte" para registrar una novedad.',
+                              'Usa el botón "Hacer Reporte" para registrar una novedad.',
                               style: TextStyle(
                                 color: secondaryTextColor,
                                 fontSize: 13,
@@ -389,37 +575,24 @@ class _IncidentsScreenState extends State<IncidentsScreen> {
                                     mainAxisAlignment:
                                         MainAxisAlignment.spaceBetween,
                                     children: [
-                                      Row(
-                                        children: [
-                                          Container(
-                                            padding: const EdgeInsets.symmetric(
-                                              horizontal: 8,
-                                              vertical: 4,
-                                            ),
-                                            decoration: BoxDecoration(
-                                              color: Colors.black38,
-                                              borderRadius:
-                                                  BorderRadius.circular(6),
-                                            ),
-                                            child: Text(
-                                              item.id,
-                                              style: const TextStyle(
-                                                color: secondaryTextColor,
-                                                fontSize: 12,
-                                                fontWeight: FontWeight.bold,
-                                              ),
-                                            ),
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 8,
+                                          vertical: 4,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: Colors.black38,
+                                          borderRadius:
+                                              BorderRadius.circular(6),
+                                        ),
+                                        child: Text(
+                                          item.id,
+                                          style: const TextStyle(
+                                            color: secondaryTextColor,
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.bold,
                                           ),
-                                          const SizedBox(width: 8),
-                                          Text(
-                                            item.type,
-                                            style: const TextStyle(
-                                              color: primaryTextColor,
-                                              fontSize: 14,
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
-                                        ],
+                                        ),
                                       ),
                                       Container(
                                         padding: const EdgeInsets.symmetric(
@@ -447,6 +620,15 @@ class _IncidentsScreenState extends State<IncidentsScreen> {
                                   ),
                                   const SizedBox(height: 10),
                                   Text(
+                                    item.type,
+                                    style: const TextStyle(
+                                      color: primaryTextColor,
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 6),
+                                  Text(
                                     item.description,
                                     style: const TextStyle(
                                       color: secondaryTextColor,
@@ -455,26 +637,33 @@ class _IncidentsScreenState extends State<IncidentsScreen> {
                                     ),
                                   ),
                                   const Divider(
-                                    color: darkBorderColor,
-                                    height: 20,
-                                  ),
+                                      color: darkBorderColor, height: 20),
                                   Row(
                                     mainAxisAlignment:
                                         MainAxisAlignment.spaceBetween,
                                     children: [
-                                      Text(
-                                        'Afectadas: ${item.affectedQuantity} unidad(es)',
-                                        style: const TextStyle(
-                                          color: activeGreen,
-                                          fontSize: 12,
-                                          fontWeight: FontWeight.w500,
-                                        ),
+                                      Row(
+                                        children: [
+                                          const Icon(
+                                            Icons.verified_rounded,
+                                            size: 14,
+                                            color: activeGreen,
+                                          ),
+                                          const SizedBox(width: 4),
+                                          Text(
+                                            'Por: ${item.authorizedBy}',
+                                            style: const TextStyle(
+                                              color: secondaryTextColor,
+                                              fontSize: 11,
+                                            ),
+                                          ),
+                                        ],
                                       ),
                                       Text(
                                         item.dateTime,
                                         style: const TextStyle(
                                           color: secondaryTextColor,
-                                          fontSize: 12,
+                                          fontSize: 11,
                                         ),
                                       ),
                                     ],

@@ -28,8 +28,9 @@ class MyApp extends StatelessWidget {
         '/inventory': (context) => const HomeShell(initialIndex: 0),
         '/reports': (context) => const HomeShell(initialIndex: 1),
         '/transfers': (context) => const HomeShell(initialIndex: 2),
-        '/tasks': (context) => const HomeShell(initialIndex: 3),
-        '/profile': (context) => const HomeShell(initialIndex: 4),
+        '/admission': (context) => const HomeShell(initialIndex: 3),
+        '/tasks': (context) => const HomeShell(initialIndex: 4),
+        '/profile': (context) => const HomeShell(initialIndex: 5),
         '/store-detail': (context) => const StoreDetailScreen(),
       },
     );

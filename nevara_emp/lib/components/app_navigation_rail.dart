@@ -178,6 +178,11 @@ class AppNavigationRail extends StatelessWidget {
             label: Text('Traslados'),
           ),
           NavigationRailDestination(
+            icon: Icon(Icons.move_to_inbox_outlined),
+            selectedIcon: Icon(Icons.move_to_inbox_rounded),
+            label: Text('Admisión'),
+          ),
+          NavigationRailDestination(
             icon: Icon(Icons.assignment_outlined),
             selectedIcon: Icon(Icons.assignment),
             label: Text('Tareas'),

@@ -26,10 +26,11 @@ void main() {
       ),
     );
 
-    // Verify all 5 destinations are present
+    // Verify all destinations are present
     expect(find.text('Inventario'), findsOneWidget);
     expect(find.text('Reportes'), findsOneWidget);
     expect(find.text('Traslados'), findsOneWidget);
+    expect(find.text('Admisión'), findsOneWidget);
     expect(find.text('Tareas'), findsOneWidget);
     expect(find.text('Perfil'), findsOneWidget);
   });
@@ -68,6 +69,11 @@ void main() {
     await tester.tap(find.text('Reportes'));
     await tester.pump();
     expect(selectedIndex, equals(1));
+
+    // Tap on 'Admisión' (index 3)
+    await tester.tap(find.text('Admisión'));
+    await tester.pump();
+    expect(selectedIndex, equals(3));
   });
 
   testWidgets('HomeShell switches screens via left navigation rail',
@@ -97,5 +103,10 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('Traslado de Productos'), findsOneWidget);
     expect(find.text('Solicitar Traslado'), findsOneWidget);
+
+    // Switch to Admisión
+    await tester.tap(find.text('Admisión'));
+    await tester.pumpAndSettle();
+    expect(find.text('Admisión de Mercancía'), findsOneWidget);
   });
 }
