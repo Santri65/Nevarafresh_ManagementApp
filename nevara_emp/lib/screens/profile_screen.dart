@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:nevara_emp/components/profile_actions.dart';
-import 'package:nevara_emp/components/profile_header.dart';
-import 'package:nevara_emp/components/stats_row.dart';
-import 'package:nevara_emp/components/store_info_card.dart';
 import 'package:nevara_emp/models/store.dart';
+import 'package:nevara_emp/models/user_session.dart';
+import 'package:nevara_emp/pages/profile_page.dart';
 
 /// Screen presenting the store employee profile.
+///
+/// This screen owns the employee data shown on the page and the navigation
+/// actions. [ProfilePage] receives the data and reports every user action back
+/// through callbacks.
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
 
@@ -14,10 +16,9 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
-  static const Color darkBackground = Color(0xFF16181E);
-  static const Color darkSurface = Color(0xFF1B1F27);
-  static const Color activeGreen = Color(0xFF81C784);
-  static const Color secondaryTextColor = Color(0xFF94A3B8);
+  late final String _employeeName;
+  late final String _employeeRole;
+  late final String _employeeId;
 
   final Store _store = const Store(
     id: 'TDA-003',
@@ -28,79 +29,32 @@ class _ProfileScreenState extends State<ProfileScreen> {
     status: 'Activo',
   );
 
+  @override
+  void initState() {
+    super.initState();
+    _employeeName = UserSession.currentName;
+    _employeeRole = UserSession.currentRole;
+    _employeeId = 'EMP-1024';
+  }
+
   void _openStoreDetail() {
     Navigator.pushNamed(context, '/store-detail', arguments: _store);
   }
 
+  void _handleLogout() {
+    UserSession.logout();
+    Navigator.pushReplacementNamed(context, '/login');
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: darkBackground,
-      appBar: AppBar(
-        title: const Text('Perfil'),
-        centerTitle: true,
-        backgroundColor: darkSurface,
-        foregroundColor: const Color(0xFFF1F5F9),
-        elevation: 0,
-      ),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            children: [
-              const ProfileHeader(
-                image: 'https://picsum.photos/400',
-                name: 'Carlos Andrés Mendoza',
-                role: 'Encargado de inventario',
-                employeeId: 'EMP-1024',
-                status: 'Activo',
-              ),
-              const SizedBox(height: 16),
-              const StatsRow(
-                tasks: '8',
-                movements: '34',
-                incidents: '2',
-              ),
-              const SizedBox(height: 16),
-              StoreInfoCard(
-                store: _store,
-                onTap: () => _openStoreDetail(),
-              ),
-              const SizedBox(height: 16),
-              const ProfileActions(
-                primaryButtonText: 'Actualizar Información',
-                secondaryButtonText: 'Cerrar Sesión',
-              ),
-            ],
-          ),
-        ),
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: 2,
-        backgroundColor: darkSurface,
-        selectedItemColor: activeGreen,
-        unselectedItemColor: secondaryTextColor,
-        elevation: 0,
-        onTap: (index) {
-          if (index == 1) {
-            Navigator.pushNamed(context, '/tasks');
-          }
-        },
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.inventory_2_outlined),
-            label: 'Inventario',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.assignment_outlined),
-            label: 'Tareas',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: 'Perfil',
-          ),
-        ],
-      ),
+    return ProfilePage(
+      employeeName: _employeeName,
+      employeeRole: _employeeRole,
+      employeeId: _employeeId,
+      store: _store,
+      onOpenStoreDetail: _openStoreDetail,
+      onLogout: _handleLogout,
     );
   }
 }

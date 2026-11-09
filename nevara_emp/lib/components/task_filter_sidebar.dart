@@ -57,13 +57,19 @@ class TaskFilterSidebar extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             _FilterButton(
-              label: 'Pendientes',
-              selected: selectedFilter == TaskFilter.pending,
-              onTap: () => onFilterSelected(TaskFilter.pending),
+              label: 'Faltantes',
+              selected: selectedFilter == TaskFilter.missing,
+              onTap: () => onFilterSelected(TaskFilter.missing),
             ),
             const SizedBox(height: 8),
             _FilterButton(
-              label: 'Completadas',
+              label: 'En proceso',
+              selected: selectedFilter == TaskFilter.inProgress,
+              onTap: () => onFilterSelected(TaskFilter.inProgress),
+            ),
+            const SizedBox(height: 8),
+            _FilterButton(
+              label: 'Terminadas',
               selected: selectedFilter == TaskFilter.completed,
               onTap: () => onFilterSelected(TaskFilter.completed),
             ),

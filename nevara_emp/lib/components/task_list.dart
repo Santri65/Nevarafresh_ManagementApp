@@ -2,16 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:nevara_emp/components/task_list_item.dart';
 import 'package:nevara_emp/models/task.dart';
 
-/// List of task cards with their completion controls.
+/// List of task cards with their status and completion controls.
 class TaskList extends StatelessWidget {
   final List<Task> tasks;
   final Function(Task) onToggleTask;
+  final Function(Task, String)? onStatusChanged;
   final String emptyMessage;
 
   const TaskList({
     super.key,
     required this.tasks,
     required this.onToggleTask,
+    this.onStatusChanged,
     required this.emptyMessage,
   });
 
@@ -54,6 +56,8 @@ class TaskList extends StatelessWidget {
           TaskListItem(
             task: tasks[index],
             onToggle: () => onToggleTask(tasks[index]),
+            onStatusChanged: (newStatus) =>
+                onStatusChanged?.call(tasks[index], newStatus),
           ),
           if (index != tasks.length - 1) const SizedBox(height: 8),
         ],

@@ -1,8 +1,12 @@
 /// Filter options available for the task list.
-enum TaskFilter { all, pending, completed }
+enum TaskFilter { all, missing, inProgress, completed }
 
 /// Model representing an operational task assigned to an employee.
 class Task {
+  static const String statusMissing = 'Faltante';
+  static const String statusInProgress = 'En proceso';
+  static const String statusCompleted = 'Terminado';
+
   final String id;
   final String description;
   final String priority;
@@ -19,7 +23,14 @@ class Task {
     this.closedDate,
   });
 
-  bool get isCompleted => status == 'Completada';
+  bool get isCompleted =>
+      status == statusCompleted || status == 'Completada';
+
+  bool get isInProgress =>
+      status == statusInProgress;
+
+  bool get isMissing =>
+      status == statusMissing || status == 'Pendiente';
 
   Task copyWith({
     String? id,

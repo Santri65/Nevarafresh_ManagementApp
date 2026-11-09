@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:nevara_emp/screens/home_shell.dart';
 import 'package:nevara_emp/screens/login_screen.dart';
-import 'package:nevara_emp/screens/profile_screen.dart';
 import 'package:nevara_emp/screens/store_detail_screen.dart';
-import 'package:nevara_emp/screens/tasks_screen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -25,9 +24,14 @@ class MyApp extends StatelessWidget {
       initialRoute: '/login',
       routes: {
         '/login': (context) => const LoginScreen(),
-        '/profile': (context) => const ProfileScreen(),
+        '/home': (context) => const HomeShell(),
+        '/inventory': (context) => const HomeShell(initialIndex: 0),
+        '/reports': (context) => const HomeShell(initialIndex: 1),
+        '/transfers': (context) => const HomeShell(initialIndex: 2),
+        '/admission': (context) => const HomeShell(initialIndex: 3),
+        '/tasks': (context) => const HomeShell(initialIndex: 4),
+        '/profile': (context) => const HomeShell(initialIndex: 5),
         '/store-detail': (context) => const StoreDetailScreen(),
-        '/tasks': (context) => const TasksScreen(),
       },
     );
   }

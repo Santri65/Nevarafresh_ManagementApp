@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:nevara_emp/models/user_session.dart';
 
 /// Screen for employee authentication / lobby in Nevara Fresh.
 class LoginScreen extends StatefulWidget {
@@ -9,12 +10,19 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  final TextEditingController _usernameController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _usernameController =
+      TextEditingController(text: 'carlos.mendoza');
+  final TextEditingController _passwordController =
+      TextEditingController(text: 'password123');
   bool _obscurePassword = true;
 
-  static const Color emeraldGreen = Color(0xFF0F8478);
-  static const Color lightBackground = Color(0xFFFDFCFB);
+  static const Color darkBackground = Color(0xFF16181E);
+  static const Color darkCardColor = Color(0xFF21252E);
+  static const Color darkBorderColor = Color(0xFF323744);
+  static const Color primaryTextColor = Color(0xFFF1F5F9);
+  static const Color secondaryTextColor = Color(0xFF94A3B8);
+  static const Color activeGreen = Color(0xFF81C784);
+  static const Color emeraldBrand = Color(0xFF0F8478);
 
   @override
   void dispose() {
@@ -24,14 +32,21 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   void _handleLogin() {
-    // Navigate to profile or main screen upon login
-    Navigator.pushReplacementNamed(context, '/profile');
+    final username = _usernameController.text.trim();
+    final password = _passwordController.text.trim();
+
+    UserSession.login(
+      username: username.isNotEmpty ? username : 'carlos.mendoza',
+      password: password.isNotEmpty ? password : 'password123',
+    );
+
+    Navigator.pushReplacementNamed(context, '/home');
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: lightBackground,
+      backgroundColor: darkBackground,
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 28.0, vertical: 24.0),
@@ -45,12 +60,12 @@ class _LoginScreenState extends State<LoginScreen> {
                     width: 44,
                     height: 44,
                     decoration: BoxDecoration(
-                      color: emeraldGreen.withValues(alpha: 0.12),
+                      color: emeraldBrand.withValues(alpha: 0.2),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: const Icon(
                       Icons.shopping_basket_rounded,
-                      color: emeraldGreen,
+                      color: activeGreen,
                       size: 26,
                     ),
                   ),
@@ -60,7 +75,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     style: TextStyle(
                       fontSize: 22,
                       fontWeight: FontWeight.bold,
-                      color: Color(0xFF1E293B),
+                      color: primaryTextColor,
                       letterSpacing: -0.5,
                     ),
                   ),
@@ -74,7 +89,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 style: TextStyle(
                   fontSize: 28,
                   fontWeight: FontWeight.bold,
-                  color: Color(0xFF0F172A),
+                  color: primaryTextColor,
                 ),
               ),
               const SizedBox(height: 8),
@@ -82,41 +97,46 @@ class _LoginScreenState extends State<LoginScreen> {
                 'Ingresa tus credenciales para acceder al portal de gestión.',
                 style: TextStyle(
                   fontSize: 15,
-                  color: Color(0xFF64748B),
+                  color: secondaryTextColor,
                 ),
               ),
               const SizedBox(height: 36),
 
               // Username field
               const Text(
-                'Usuario',
+                'Usuario o Correo',
                 style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
-                  color: Color(0xFF334155),
+                  color: secondaryTextColor,
                 ),
               ),
               const SizedBox(height: 8),
               TextField(
                 controller: _usernameController,
                 keyboardType: TextInputType.text,
+                style: const TextStyle(color: primaryTextColor),
                 decoration: InputDecoration(
                   hintText: 'ej. carlos.mendoza',
-                  prefixIcon: const Icon(Icons.person_outline_rounded, color: Color(0xFF94A3B8)),
+                  hintStyle: const TextStyle(color: secondaryTextColor),
+                  prefixIcon: const Icon(Icons.person_outline_rounded,
+                      color: secondaryTextColor),
                   filled: true,
-                  fillColor: Colors.white,
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                  fillColor: darkCardColor,
+                  contentPadding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
-                    borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
+                    borderSide: const BorderSide(color: darkBorderColor),
                   ),
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
-                    borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
+                    borderSide: const BorderSide(color: darkBorderColor),
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
-                    borderSide: const BorderSide(color: emeraldGreen, width: 1.8),
+                    borderSide:
+                        const BorderSide(color: activeGreen, width: 1.8),
                   ),
                 ),
               ),
@@ -128,20 +148,25 @@ class _LoginScreenState extends State<LoginScreen> {
                 style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
-                  color: Color(0xFF334155),
+                  color: secondaryTextColor,
                 ),
               ),
               const SizedBox(height: 8),
               TextField(
                 controller: _passwordController,
                 obscureText: _obscurePassword,
+                style: const TextStyle(color: primaryTextColor),
                 decoration: InputDecoration(
                   hintText: '••••••••',
-                  prefixIcon: const Icon(Icons.lock_outline_rounded, color: Color(0xFF94A3B8)),
+                  hintStyle: const TextStyle(color: secondaryTextColor),
+                  prefixIcon: const Icon(Icons.lock_outline_rounded,
+                      color: secondaryTextColor),
                   suffixIcon: IconButton(
                     icon: Icon(
-                      _obscurePassword ? Icons.visibility_outlined : Icons.visibility_off_outlined,
-                      color: const Color(0xFF94A3B8),
+                      _obscurePassword
+                          ? Icons.visibility_outlined
+                          : Icons.visibility_off_outlined,
+                      color: secondaryTextColor,
                     ),
                     onPressed: () {
                       setState(() {
@@ -150,19 +175,21 @@ class _LoginScreenState extends State<LoginScreen> {
                     },
                   ),
                   filled: true,
-                  fillColor: Colors.white,
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                  fillColor: darkCardColor,
+                  contentPadding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
-                    borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
+                    borderSide: const BorderSide(color: darkBorderColor),
                   ),
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
-                    borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
+                    borderSide: const BorderSide(color: darkBorderColor),
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
-                    borderSide: const BorderSide(color: emeraldGreen, width: 1.8),
+                    borderSide:
+                        const BorderSide(color: activeGreen, width: 1.8),
                   ),
                 ),
               ),
@@ -172,7 +199,7 @@ class _LoginScreenState extends State<LoginScreen> {
               ElevatedButton(
                 onPressed: _handleLogin,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: emeraldGreen,
+                  backgroundColor: emeraldBrand,
                   foregroundColor: Colors.white,
                   padding: const EdgeInsets.symmetric(vertical: 16),
                   shape: RoundedRectangleBorder(
@@ -201,13 +228,13 @@ class _LoginScreenState extends State<LoginScreen> {
                       text: '¿No tienes cuenta? ',
                       style: TextStyle(
                         fontSize: 14,
-                        color: Color(0xFF64748B),
+                        color: secondaryTextColor,
                       ),
                       children: [
                         TextSpan(
                           text: 'Regístrate',
                           style: TextStyle(
-                            color: emeraldGreen,
+                            color: activeGreen,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
