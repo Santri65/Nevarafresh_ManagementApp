@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:nevara_emp/models/admission_manager.dart';
 import 'package:nevara_emp/models/inventory_repository.dart';
 import 'package:nevara_emp/models/user_session.dart';
 import 'package:nevara_emp/screens/admission_screen.dart';
@@ -162,10 +161,10 @@ void main() {
   });
 
   group('AdmissionScreen Concurrency and Session', () {
-    testWidgets('binds receiver to logged-in user and locks concurrency',
+    testWidgets(
+        'binds receiver to logged-in user and updates inventory on completion',
         (WidgetTester tester) async {
-      final manager = AdmissionManager.instance;
-      expect(manager.isLocked, isFalse);
+      final repo = InventoryRepository.instance;
 
       await tester.pumpWidget(
         const MaterialApp(home: AdmissionScreen()),
@@ -189,37 +188,42 @@ void main() {
         findsOneWidget,
       );
 
-      // Close dialog
-      await tester.tap(find.text('Cancelar / Liberar Turno'));
+      // Completing without the session email must be rejected
+      await tester.tap(find.text('Completar Admisión'));
+      await tester.pumpAndSettle();
+      expect(
+        find.text(
+            'Debe ingresar su correo para confirmar la responsabilidad de la admisión.'),
+        findsOneWidget,
+      );
+
+      // Confirm with the logged-in user's email
+      await tester.enterText(
+        find.widgetWithText(
+          TextField,
+          'Ingresa tu correo (carlos.mendoza@nevarafresh.com)',
+        ),
+        'carlos.mendoza@nevarafresh.com',
+      );
+      await tester.pump();
+
+      await tester.tap(find.text('Completar Admisión'));
       await tester.pumpAndSettle();
 
-      // Concurrency lock demonstration
+      // Admission completed, lock released and inventory updated
+      expect(find.text('Canal de Admisión Habilitado'), findsOneWidget);
       expect(
-        manager.claimAdmission(
-          shipmentId: 'REC-501',
-          userEmail: 'carlos.mendoza@nevarafresh.com',
-          userName: 'Carlos Andrés Mendoza',
+        repo.items.any(
+          (item) => item.name == 'Aguacate Hass' && item.totalAvailable == 30,
         ),
         isTrue,
       );
-
-      // Another employee attempt fails
       expect(
-        manager.isLockedByOther('otro.empleado@nevarafresh.com'),
+        repo.items.any(
+          (item) => item.name == 'Papaya Maradol' && item.totalAvailable == 25,
+        ),
         isTrue,
       );
-      expect(
-        manager.claimAdmission(
-          shipmentId: 'REC-502',
-          userEmail: 'otro.empleado@nevarafresh.com',
-          userName: 'Otro Empleado',
-        ),
-        isFalse,
-      );
-
-      // Release lock for cleanup
-      manager.releaseClaim('REC-501');
-      expect(manager.isLocked, isFalse);
     });
   });
 }

@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:nevara_emp/components/task_filter_sidebar.dart';
-import 'package:nevara_emp/components/task_list.dart';
 import 'package:nevara_emp/models/task.dart';
+import 'package:nevara_emp/pages/tasks_page.dart';
 
 /// Screen for consulting and updating the employee's operational tasks.
+///
+/// This screen owns the task list and the active filter. [TasksPage] receives
+/// the data and reports every user action back through callbacks.
 class TasksScreen extends StatefulWidget {
   const TasksScreen({super.key});
 
@@ -12,7 +14,6 @@ class TasksScreen extends StatefulWidget {
 }
 
 class _TasksScreenState extends State<TasksScreen> {
-  static const Color darkBackground = Color(0xFF16181E);
   static const Color darkSurface = Color(0xFF1B1F27);
   static const Color darkCardColor = Color(0xFF21252E);
   static const Color darkBorderColor = Color(0xFF323744);
@@ -87,6 +88,12 @@ class _TasksScreenState extends State<TasksScreen> {
       case TaskFilter.all:
         return 'No hay tareas asignadas.';
     }
+  }
+
+  void _onFilterSelected(TaskFilter filter) {
+    setState(() {
+      _filter = filter;
+    });
   }
 
   void _toggleTask(Task task) {
@@ -203,7 +210,8 @@ class _TasksScreenState extends State<TasksScreen> {
                           style: const TextStyle(color: primaryTextColor),
                           items: const [
                             DropdownMenuItem(value: 'Alta', child: Text('Alta')),
-                            DropdownMenuItem(value: 'Media', child: Text('Media')),
+                            DropdownMenuItem(
+                                value: 'Media', child: Text('Media')),
                             DropdownMenuItem(value: 'Baja', child: Text('Baja')),
                           ],
                           onChanged: (val) {
@@ -300,84 +308,14 @@ class _TasksScreenState extends State<TasksScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: darkBackground,
-      appBar: AppBar(
-        automaticallyImplyLeading: false,
-        centerTitle: false,
-        titleSpacing: 16,
-        title: const Text(
-          'Tareas',
-          style: TextStyle(
-            fontSize: 22,
-            fontWeight: FontWeight.bold,
-            color: primaryTextColor,
-          ),
-        ),
-        actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 12),
-            child: ElevatedButton.icon(
-              onPressed: _showNewTaskDialog,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: emeraldBrand,
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-              ),
-              icon: const Icon(Icons.add, size: 18),
-              label: const Text(
-                'Nueva Tarea',
-                style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
-              ),
-            ),
-          ),
-        ],
-        backgroundColor: darkSurface,
-        foregroundColor: primaryTextColor,
-        elevation: 0,
-      ),
-      body: SafeArea(
-        child: LayoutBuilder(
-          builder: (context, constraints) {
-            final compact = constraints.maxWidth < 600;
-            final filteredTasks = _filteredTasks;
-
-            return Padding(
-              padding: EdgeInsets.all(compact ? 12 : 16),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  SizedBox(
-                    width: compact ? 126 : 200,
-                    child: TaskFilterSidebar(
-                      selectedFilter: _filter,
-                      onFilterSelected: (filter) {
-                        setState(() {
-                          _filter = filter;
-                        });
-                      },
-                    ),
-                  ),
-                  SizedBox(width: compact ? 12 : 16),
-                  Expanded(
-                    child: SingleChildScrollView(
-                      child: TaskList(
-                        tasks: filteredTasks,
-                        onToggleTask: _toggleTask,
-                        onStatusChanged: _updateTaskStatus,
-                        emptyMessage: _emptyMessage,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            );
-          },
-        ),
-      ),
+    return TasksPage(
+      filteredTasks: _filteredTasks,
+      selectedFilter: _filter,
+      emptyMessage: _emptyMessage,
+      onFilterSelected: _onFilterSelected,
+      onToggleTask: _toggleTask,
+      onStatusChanged: _updateTaskStatus,
+      onNewTask: _showNewTaskDialog,
     );
   }
 }

@@ -1,8 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:nevara_emp/models/admission_manager.dart';
+import 'package:nevara_emp/models/admission_shipment.dart';
+import 'package:nevara_emp/models/inventory_repository.dart';
 import 'package:nevara_emp/models/user_session.dart';
+import 'package:nevara_emp/pages/admission_page.dart';
 
 /// Screen presenting incoming merchandise deliveries (Admisión / Recepción de Mercancía).
+///
+/// This screen owns the shipments list and the single-employee concurrency
+/// lock. [AdmissionPage] receives the data and reports every user action back
+/// through callbacks.
 ///
 /// Enforces single-employee concurrency: only one employee at a time in the store can
 /// process an admission, automatically binds to the logged-in device user, and requires
@@ -15,7 +21,6 @@ class AdmissionScreen extends StatefulWidget {
 }
 
 class _AdmissionScreenState extends State<AdmissionScreen> {
-  static const Color darkBackground = Color(0xFF16181E);
   static const Color darkSurface = Color(0xFF1B1F27);
   static const Color darkCardColor = Color(0xFF21252E);
   static const Color darkBorderColor = Color(0xFF323744);
@@ -23,27 +28,179 @@ class _AdmissionScreenState extends State<AdmissionScreen> {
   static const Color secondaryTextColor = Color(0xFF94A3B8);
   static const Color activeGreen = Color(0xFF81C784);
   static const Color emeraldBrand = Color(0xFF0F8478);
-  static const Color warningOrange = Color(0xFFFFB74D);
   static const Color dangerCoral = Color(0xFFFF8A80);
 
-  final AdmissionManager _admissionManager = AdmissionManager.instance;
+  late List<AdmissionShipment> _shipments;
+
+  String? _activeClaimantEmail;
+  String? _activeClaimantName;
+  String? _activeShipmentId;
+
+  static const List<AdmissionShipment> _initialShipments = [
+    AdmissionShipment(
+      id: 'REC-501',
+      supplier: 'AgroFrescos del Valle S.A.',
+      expectedDate: '08/11/2026 14:30',
+      status: 'Pendiente',
+      items: [
+        AdmissionProduct(
+          name: 'Aguacate Hass',
+          quantity: 30,
+          unit: 'kg',
+          category: 'Frutas y Verduras',
+        ),
+        AdmissionProduct(
+          name: 'Papaya Maradol',
+          quantity: 25,
+          unit: 'kg',
+          category: 'Frutas y Verduras',
+        ),
+      ],
+      observations:
+          'Camión con refrigeración a 4°C. Revisión de empaques requerida.',
+    ),
+    AdmissionShipment(
+      id: 'REC-502',
+      supplier: 'Lácteos del Sur LTDA',
+      expectedDate: '08/11/2026 16:00',
+      status: 'Pendiente',
+      items: [
+        AdmissionProduct(
+          name: 'Leche Entera 1L',
+          quantity: 40,
+          unit: 'un',
+          category: 'Lácteos',
+        ),
+        AdmissionProduct(
+          name: 'Queso Campesino 500g',
+          quantity: 15,
+          unit: 'un',
+          category: 'Lácteos',
+        ),
+      ],
+      observations: 'Entrega regular semanal con factura 9821.',
+    ),
+    AdmissionShipment(
+      id: 'REC-500',
+      supplier: 'Distribuidora Carnes del Campo',
+      expectedDate: '07/11/2026 10:00',
+      status: 'Completada',
+      assignedEmployeeEmail: 'carlos.mendoza@nevarafresh.com',
+      assignedEmployeeName: 'Carlos Andrés Mendoza',
+      items: [
+        AdmissionProduct(
+          name: 'Pechuga de Pollo Fresca',
+          quantity: 20,
+          unit: 'kg',
+          category: 'Carnes',
+        ),
+      ],
+      observations: 'Recepción completa sin anomalías.',
+      completedAt: '07/11/2026 10:45',
+    ),
+  ];
 
   @override
   void initState() {
     super.initState();
-    _admissionManager.addListener(_onStateUpdated);
+    _shipments = List<AdmissionShipment>.from(_initialShipments);
   }
 
-  @override
-  void dispose() {
-    _admissionManager.removeListener(_onStateUpdated);
-    super.dispose();
+  bool get _isLocked => _activeClaimantEmail != null;
+
+  bool _isLockedByOther(String currentEmail) {
+    if (!_isLocked) return false;
+    return _activeClaimantEmail?.trim().toLowerCase() !=
+        currentEmail.trim().toLowerCase();
   }
 
-  void _onStateUpdated() {
-    if (mounted) {
-      setState(() {});
+  /// Claims the admission lock for a specific shipment.
+  /// Returns false if already locked by another employee.
+  bool _claimAdmission({
+    required String shipmentId,
+    required String userEmail,
+    required String userName,
+  }) {
+    if (_isLockedByOther(userEmail)) {
+      return false;
     }
+
+    setState(() {
+      _activeClaimantEmail = userEmail;
+      _activeClaimantName = userName;
+      _activeShipmentId = shipmentId;
+
+      final index = _shipments.indexWhere((s) => s.id == shipmentId);
+      if (index != -1) {
+        _shipments[index] = _shipments[index].copyWith(
+          status: 'En proceso',
+          assignedEmployeeEmail: userEmail,
+          assignedEmployeeName: userName,
+        );
+      }
+    });
+
+    return true;
+  }
+
+  /// Cancels / releases the lock if the employee cancels the reception.
+  void _releaseClaim(String shipmentId) {
+    if (_activeShipmentId != shipmentId) return;
+
+    setState(() {
+      _activeClaimantEmail = null;
+      _activeClaimantName = null;
+      _activeShipmentId = null;
+
+      final index = _shipments.indexWhere((s) => s.id == shipmentId);
+      if (index != -1 && _shipments[index].status == 'En proceso') {
+        _shipments[index] = _shipments[index].copyWith(
+          status: 'Pendiente',
+          clearAssignment: true,
+        );
+      }
+    });
+  }
+
+  /// Completes the admission, increments inventory stock, and unlocks admission for others.
+  bool _completeAdmission({
+    required String shipmentId,
+    required String userEmail,
+    required String observations,
+  }) {
+    final index = _shipments.indexWhere((s) => s.id == shipmentId);
+    if (index == -1) return false;
+
+    final shipment = _shipments[index];
+
+    // Add each received product into store inventory
+    for (final prod in shipment.items) {
+      InventoryRepository.instance.addStockFromAdmission(
+        name: prod.name,
+        quantity: prod.quantity,
+        unit: prod.unit,
+        category: prod.category,
+      );
+    }
+
+    setState(() {
+      _shipments[index] = shipment.copyWith(
+        status: 'Completada',
+        assignedEmployeeEmail: userEmail,
+        observations:
+            observations.isNotEmpty ? observations : shipment.observations,
+        completedAt: '08/11/2026 15:00',
+      );
+
+      // Release lock so others can conduct subsequent admissions
+      if (_activeShipmentId == shipmentId) {
+        _activeClaimantEmail = null;
+        _activeClaimantName = null;
+        _activeShipmentId = null;
+      }
+    });
+
+    return true;
   }
 
   void _openAdmissionProcess(AdmissionShipment shipment) {
@@ -51,11 +208,11 @@ class _AdmissionScreenState extends State<AdmissionScreen> {
     final currentName = UserSession.currentName;
 
     // Check if another employee already locked the admission process
-    if (_admissionManager.isLockedByOther(currentEmail)) {
+    if (_isLockedByOther(currentEmail)) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            'Admisión bloqueada: Solo un empleado puede procesar admisiones a la vez. Actualmente en proceso por ${_admissionManager.activeClaimantEmail}.',
+            'Admisión bloqueada: Solo un empleado puede procesar admisiones a la vez. Actualmente en proceso por $_activeClaimantEmail.',
           ),
           backgroundColor: dangerCoral,
           duration: const Duration(seconds: 4),
@@ -65,7 +222,8 @@ class _AdmissionScreenState extends State<AdmissionScreen> {
     }
 
     final emailConfirmController = TextEditingController();
-    final obsController = TextEditingController(text: shipment.observations ?? '');
+    final obsController =
+        TextEditingController(text: shipment.observations ?? '');
     String? dialogError;
 
     showDialog(
@@ -74,8 +232,8 @@ class _AdmissionScreenState extends State<AdmissionScreen> {
       builder: (ctx) {
         return StatefulBuilder(
           builder: (dialogCtx, setDialogState) {
-            final isLockedByMe = _admissionManager.activeClaimantEmail == currentEmail &&
-                _admissionManager.activeShipmentId == shipment.id;
+            final isLockedByMe = _activeClaimantEmail == currentEmail &&
+                _activeShipmentId == shipment.id;
 
             return AlertDialog(
               backgroundColor: darkSurface,
@@ -304,7 +462,7 @@ class _AdmissionScreenState extends State<AdmissionScreen> {
                 TextButton(
                   onPressed: () {
                     if (isLockedByMe) {
-                      _admissionManager.releaseClaim(shipment.id);
+                      _releaseClaim(shipment.id);
                     }
                     Navigator.pop(ctx);
                   },
@@ -313,7 +471,8 @@ class _AdmissionScreenState extends State<AdmissionScreen> {
                 ),
                 ElevatedButton(
                   onPressed: () {
-                    final enteredEmail = emailConfirmController.text.trim().toLowerCase();
+                    final enteredEmail =
+                        emailConfirmController.text.trim().toLowerCase();
                     final expectedEmail = currentEmail.trim().toLowerCase();
 
                     if (enteredEmail.isEmpty) {
@@ -333,7 +492,7 @@ class _AdmissionScreenState extends State<AdmissionScreen> {
                     }
 
                     // Enforce lock acquisition
-                    final claimed = _admissionManager.claimAdmission(
+                    final claimed = _claimAdmission(
                       shipmentId: shipment.id,
                       userEmail: currentEmail,
                       userName: currentName,
@@ -348,7 +507,7 @@ class _AdmissionScreenState extends State<AdmissionScreen> {
                     }
 
                     // Complete the admission and deposit to inventory
-                    _admissionManager.completeAdmission(
+                    _completeAdmission(
                       shipmentId: shipment.id,
                       userEmail: currentEmail,
                       observations: obsController.text.trim(),
@@ -383,307 +542,14 @@ class _AdmissionScreenState extends State<AdmissionScreen> {
   @override
   Widget build(BuildContext context) {
     final currentEmail = UserSession.currentEmail;
-    final isLockedByOther = _admissionManager.isLockedByOther(currentEmail);
-    final shipments = _admissionManager.shipments;
 
-    return Scaffold(
-      backgroundColor: darkBackground,
-      appBar: AppBar(
-        title: const Text('Admisión de Mercancía'),
-        centerTitle: false,
-        backgroundColor: darkSurface,
-        foregroundColor: primaryTextColor,
-        elevation: 0,
-      ),
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              // Concurrency policy banner
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: isLockedByOther
-                      ? dangerCoral.withValues(alpha: 0.12)
-                      : emeraldBrand.withValues(alpha: 0.12),
-                  borderRadius: BorderRadius.circular(10),
-                  border: Border.all(
-                    color: isLockedByOther
-                        ? dangerCoral.withValues(alpha: 0.5)
-                        : emeraldBrand.withValues(alpha: 0.4),
-                  ),
-                ),
-                child: Row(
-                  children: [
-                    Icon(
-                      isLockedByOther
-                          ? Icons.lock_clock_rounded
-                          : Icons.verified_user_rounded,
-                      color: isLockedByOther ? dangerCoral : activeGreen,
-                      size: 22,
-                    ),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            isLockedByOther
-                                ? 'Admisión bloqueada por concurrencia'
-                                : 'Canal de Admisión Habilitado',
-                            style: TextStyle(
-                              color: isLockedByOther ? dangerCoral : activeGreen,
-                              fontSize: 13,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          const SizedBox(height: 2),
-                          Text(
-                            isLockedByOther
-                                ? 'El empleado "${_admissionManager.activeClaimantName ?? _admissionManager.activeClaimantEmail}" ya está registrando una admisión activa. Solo un empleado puede operar a la vez.'
-                                : 'Solo un empleado en tienda puede realizar admisiones al tiempo. Tu usuario ($currentEmail) será asignado automáticamente.',
-                            style: const TextStyle(
-                              color: secondaryTextColor,
-                              fontSize: 11,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 16),
-
-              const Text(
-                'Entregas y Cargas Programadas:',
-                style: TextStyle(
-                  color: primaryTextColor,
-                  fontSize: 15,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 12),
-
-              // Shipments list
-              Expanded(
-                child: ListView.builder(
-                  itemCount: shipments.length,
-                  itemBuilder: (context, index) {
-                    final item = shipments[index];
-                    final isCompleted = item.status == 'Completada';
-                    final isInProcess = item.status == 'En proceso';
-
-                    return Card(
-                      margin: const EdgeInsets.only(bottom: 12),
-                      color: darkCardColor,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        side: BorderSide(
-                          color: isCompleted
-                              ? activeGreen.withValues(alpha: 0.4)
-                              : isInProcess
-                                  ? warningOrange.withValues(alpha: 0.6)
-                                  : darkBorderColor,
-                        ),
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.all(16),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 8,
-                                    vertical: 4,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: Colors.black38,
-                                    borderRadius: BorderRadius.circular(6),
-                                  ),
-                                  child: Text(
-                                    item.id,
-                                    style: const TextStyle(
-                                      color: secondaryTextColor,
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ),
-                                Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 10,
-                                    vertical: 4,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: isCompleted
-                                        ? activeGreen.withValues(alpha: 0.15)
-                                        : isInProcess
-                                            ? warningOrange.withValues(alpha: 0.15)
-                                            : Colors.blue.withValues(alpha: 0.15),
-                                    borderRadius: BorderRadius.circular(20),
-                                    border: Border.all(
-                                      color: isCompleted
-                                          ? activeGreen.withValues(alpha: 0.5)
-                                          : isInProcess
-                                              ? warningOrange.withValues(alpha: 0.5)
-                                              : Colors.blue.withValues(alpha: 0.5),
-                                    ),
-                                  ),
-                                  child: Text(
-                                    item.status,
-                                    style: TextStyle(
-                                      color: isCompleted
-                                          ? activeGreen
-                                          : isInProcess
-                                              ? warningOrange
-                                              : Colors.blue,
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 10),
-                            Text(
-                              item.supplier,
-                              style: const TextStyle(
-                                color: primaryTextColor,
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              'Fecha programada: ${item.expectedDate}',
-                              style: const TextStyle(
-                                color: secondaryTextColor,
-                                fontSize: 12,
-                              ),
-                            ),
-                            const Divider(color: darkBorderColor, height: 20),
-
-                            // Items breakdown
-                            const Text(
-                              'Cargamento a recepcionar:',
-                              style: TextStyle(
-                                color: secondaryTextColor,
-                                fontSize: 11,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                            const SizedBox(height: 6),
-                            Wrap(
-                              spacing: 8,
-                              runSpacing: 6,
-                              children: item.items.map((prod) {
-                                return Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 8,
-                                    vertical: 4,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: Colors.black26,
-                                    borderRadius: BorderRadius.circular(6),
-                                    border: Border.all(color: darkBorderColor),
-                                  ),
-                                  child: Text(
-                                    '${prod.name}: ${prod.quantity} ${prod.unit}',
-                                    style: const TextStyle(
-                                      color: primaryTextColor,
-                                      fontSize: 11,
-                                    ),
-                                  ),
-                                );
-                              }).toList(),
-                            ),
-
-                            if (item.observations != null) ...[
-                              const SizedBox(height: 10),
-                              Text(
-                                'Obs: ${item.observations}',
-                                style: const TextStyle(
-                                  color: secondaryTextColor,
-                                  fontSize: 11,
-                                  fontStyle: FontStyle.italic,
-                                ),
-                              ),
-                            ],
-
-                            const SizedBox(height: 14),
-
-                            // Action button
-                            if (isCompleted)
-                              Row(
-                                children: [
-                                  const Icon(Icons.check_circle_rounded,
-                                      color: activeGreen, size: 16),
-                                  const SizedBox(width: 6),
-                                  Expanded(
-                                    child: Text(
-                                      'Recibido por ${item.assignedEmployeeEmail ?? item.assignedEmployeeName} (${item.completedAt ?? "Completado"})',
-                                      style: const TextStyle(
-                                        color: activeGreen,
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.w500,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              )
-                            else
-                              SizedBox(
-                                width: double.infinity,
-                                child: ElevatedButton.icon(
-                                  onPressed: isLockedByOther
-                                      ? null
-                                      : () => _openAdmissionProcess(item),
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: emeraldBrand,
-                                    foregroundColor: Colors.white,
-                                    disabledBackgroundColor: Colors.white12,
-                                    disabledForegroundColor: secondaryTextColor,
-                                    padding: const EdgeInsets.symmetric(vertical: 12),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                  ),
-                                  icon: Icon(
-                                    isLockedByOther
-                                        ? Icons.lock_outline_rounded
-                                        : Icons.input_rounded,
-                                    size: 18,
-                                  ),
-                                  label: Text(
-                                    isLockedByOther
-                                        ? 'Bloqueado por otro empleado'
-                                        : isInProcess
-                                            ? 'Continuar Admisión'
-                                            : 'Iniciar Admisión de Productos',
-                                    style: const TextStyle(
-                                      fontSize: 13,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                          ],
-                        ),
-                      ),
-                    );
-                  },
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
+    return AdmissionPage(
+      shipments: _shipments,
+      currentEmail: currentEmail,
+      isLockedByOther: _isLockedByOther(currentEmail),
+      activeClaimantName: _activeClaimantName,
+      activeClaimantEmail: _activeClaimantEmail,
+      onOpenAdmission: _openAdmissionProcess,
     );
   }
 }
