@@ -2,8 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:nevara_emp/screens/home_shell.dart';
 import 'package:nevara_emp/screens/login_screen.dart';
 import 'package:nevara_emp/screens/store_detail_screen.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
-void main() {
+
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Supabase.initialize(
+    url: 'https://ghpphxrpwbbjoixrmaao.supabase.co',
+    publishableKey: 'sb_publishable_W3XxesMpZS34uqMELMdmSQ_k1NOBA5z',
+  );
   runApp(const MyApp());
 }
 
